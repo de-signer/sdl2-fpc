@@ -1,0 +1,18 @@
+SDL2 headers for Free Pascal
+
+1.03 (15.11.13)
+  Fixed TSDL_Event record
+
+1.02 (13.11.13)
+  SDL 2.0.1
+
+1.01 (22.09.13)
+  Added some functions from SDL_stdinc.
+
+1.0 (11.09.13)
+  Initial release:
+    SDL       2.0.0
+    SDL_ttf   2.0.12
+    SDL_mixer 2.0.0
+    SDL_image 2.0.0
+    SDL_net   2.0.0
