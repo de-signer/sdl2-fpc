@@ -1,5 +1,8 @@
 SDL2 headers for Free Pascal
 
+1.04 (07.01.14)
+  Various small fixes
+
 1.03 (15.11.13)
   Fixed TSDL_Event record
 

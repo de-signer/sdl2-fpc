@@ -12,7 +12,9 @@
     • SDL_atomic
     • SDL_assert
     • SDL_main
-    • SDL_endian (use FPC_LITTLE/BIG_ENDIAN instead to avoid compiler warnings)
+    • SDL_endian:
+        SDL_(LIL/BIG)_ENDIAN -> FPC_(LITTLE/BIG)_ENDIAN (or ENDIAN_(LITTLE/BIG))
+        SDL_SwapXX -> SwapEndian/LEToN/BEToN/NToLE/NToBE
 
 =====
 
@@ -20,8 +22,6 @@
 unit SDL2;
 
 interface
-
-uses unixtype;
 
 {$MACRO ON}
 {$PACKRECORDS C}
@@ -62,6 +62,8 @@ type
   //size_t = longword;
 
   TSDL_iconv_t = pointer;
+
+  pwchar_t = plongint;
 
 function SDL_malloc(size: longword): pointer; lSDL;
 function SDL_calloc(nmemb: longword; size: longword): pointer; lSDL;
@@ -469,7 +471,7 @@ type
                     num: longword): longword; cdecl;
     close: function(context: PSDL_RWops): longint; cdecl;
     type_: Uint32;
-  case Integer of
+  case integer of
     0: (stdio: record
           autoclose: SDL_bool;
           fp: file;
@@ -505,7 +507,7 @@ type
             size: longword;
             left: longword;
           end;
-        end;
+        end;);
     {$ENDIF}
   end;
 
@@ -1188,7 +1190,7 @@ const
 
 type
   TSDL_WindowShapeParams = record
-    case Integer of
+    case integer of
       0: (binarizationCutoff: Uint8;);
       1: (colorKey: TSDL_Color;);
   end;
@@ -1816,7 +1818,7 @@ type
     scancode: TSDL_ScanCode;
     sym: TSDL_KeyCode;
     _mod: UInt16;
-    unused: UInt32;
+    unused: Uint32;
   end;
 
 function SDL_GetKeyboardFocus: PSDL_Window; lSDL;
@@ -1868,8 +1870,8 @@ const
   SDL_BUTTON_X2MASK = 1 shl ((SDL_BUTTON_X2)-1);
 
 function SDL_GetMouseFocus: PSDL_Window; lSDL;
-function SDL_GetMouseState(x, y: plongint): UInt32; lSDL;
-function SDL_GetRelativeMouseState(x, y: plongint): UInt32; lSDL;
+function SDL_GetMouseState(x, y: plongint): Uint32; lSDL;
+function SDL_GetRelativeMouseState(x, y: plongint): Uint32; lSDL;
 procedure SDL_WarpMouseInWindow(window: PSDL_Window; x, y: longint); lSDL;
 function SDL_SetRelativeMouseMode(enabled: SDL_bool): longint; lSDL;
 function SDL_GetRelativeMouseMode: SDL_bool; lSDL;
@@ -2143,7 +2145,7 @@ type
 
   PSDL_HapticEffect = ^TSDL_HapticEffect;
   TSDL_HapticEffect = record
-    case Integer of
+    case Uint16 of
       0: (type_: Uint16);
       1: (constant: TSDL_HapticConstant);
       2: (periodic: TSDL_HapticPeriodic);
@@ -2209,7 +2211,7 @@ type
   end;
 
 const
-  SDL_TOUCH_MOUSEID = UInt32(-1);
+  SDL_TOUCH_MOUSEID = Uint32(-1);
 
 function SDL_GetNumTouchDevices: longint; lSDL;
 function SDL_GetTouchDevice(index: longint): TSDL_TouchID; lSDL;
@@ -2298,14 +2300,14 @@ type
   TSDL_EventType = longword;
 
   TSDL_CommonEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
   end;
 
   TSDL_WindowEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
     event: UInt8;
     padding1: UInt8;
     padding2: UInt8;
@@ -2315,9 +2317,9 @@ type
   end;
 
   TSDL_KeyboardEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
     state: UInt8;
     _repeat: UInt8;
     padding2: UInt8;
@@ -2328,9 +2330,9 @@ type
 {$DEFINE SDL_TEXTEDITINGEVENT_TEXT_SIZE:=32}
 
   TSDL_TextEditingEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
     text: array[0..SDL_TEXTEDITINGEVENT_TEXT_SIZE] of char;
     start: SInt32;
     length: SInt32;
@@ -2339,18 +2341,18 @@ type
 {$DEFINE SDL_TEXTINPUTEVENT_TEXT_SIZE:=32}
 
   TSDL_TextInputEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
     text: array[0..SDL_TEXTINPUTEVENT_TEXT_SIZE] of char;
   end;
 
   TSDL_MouseMotionEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
-    which: UInt32;
-    state: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
+    which: Uint32;
+    state: Uint32;
     x: SInt32;
     y: SInt32;
     xrel: SInt32;
@@ -2358,10 +2360,10 @@ type
   end;
 
   TSDL_MouseButtonEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
-    which: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
+    which: Uint32;
     button: UInt8;
     state: UInt8;
     padding1: UInt8;
@@ -2371,17 +2373,17 @@ type
   end;
 
   TSDL_MouseWheelEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
-    which: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
+    which: Uint32;
     x: SInt32;
     y: SInt32;
   end;
 
   TSDL_JoyAxisEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: TSDL_JoystickID;
     axis: UInt8;
     padding1: UInt8;
@@ -2392,8 +2394,8 @@ type
   end;
 
   TSDL_JoyBallEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: TSDL_JoystickID;
     ball: UInt8;
     padding1: UInt8;
@@ -2404,8 +2406,8 @@ type
   end;
 
   TSDL_JoyHatEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: TSDL_JoystickID;
     hat: UInt8;
     value: UInt8;
@@ -2414,8 +2416,8 @@ type
   end;
 
   TSDL_JoyButtonEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: TSDL_JoystickID;
     button: UInt8;
     state: UInt8;
@@ -2424,14 +2426,14 @@ type
   end;
 
   TSDL_JoyDeviceEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: SInt32;
   end;
 
   TSDL_ControllerAxisEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: TSDL_JoystickID;
     axis: UInt8;
     padding1: UInt8;
@@ -2442,8 +2444,8 @@ type
   end;
 
   TSDL_ControllerButtonEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: TSDL_JoystickID;
     button: UInt8;
     state: UInt8;
@@ -2452,14 +2454,14 @@ type
   end;
 
   TSDL_ControllerDeviceEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     which: SInt32;
   end;
 
   TSDL_TouchFingerEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     touchId: TSDL_TouchID;
     fingerId: TSDL_FingerID;
     x: single;
@@ -2470,8 +2472,8 @@ type
   end;
 
   TSDL_MultiGestureEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     touchId: TSDL_TouchID;
     dTheta: single;
     dDist: single;
@@ -2482,36 +2484,36 @@ type
   end;
 
   TSDL_DollarGestureEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     touchId: TSDL_TouchID;
     gestureId: TSDL_GestureID;
-    numFingers: UInt32;
+    numFingers: Uint32;
     error: single;
     x: single;
     y: single;
   end;
 
   TSDL_DropEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
     _file: pchar;
   end;
 
   TSDL_QuitEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
   end;
 
   TSDL_OSEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
   end;
 
   TSDL_UserEvent = record
-    type_: UInt32;
-    timestamp: UInt32;
-    windowID: UInt32;
+    type_: Uint32;
+    timestamp: Uint32;
+    windowID: Uint32;
     code: SInt32;
     data1: pointer;
     data2: pointer;
@@ -2520,45 +2522,45 @@ type
   TSDL_SysWMEvent = record
     type_: Uint32;
     timestamp: Uint32;
-    msg: pointer; //todo?
+    msg: pointer;
   end;
 
   PSDL_Event = ^TSDL_Event;
   TSDL_Event = record
-    case Integer of
-      0: (type_: UInt32);
-      1: (common: TSDL_CommonEvent);
-      SDL_WINDOWEVENT: (window: TSDL_WindowEvent);
+    case Uint32 of
+      0:                                  (type_: Uint32);
+      1:                                  (common: TSDL_CommonEvent);
+      SDL_WINDOWEVENT:                    (window: TSDL_WindowEvent);
       SDL_KEYUP,
-      SDL_KEYDOWN: (key: TSDL_KeyboardEvent);
-      SDL_TEXTEDITING: (edit: TSDL_TextEditingEvent);
-      SDL_TEXTINPUT: (text: TSDL_TextInputEvent);
-      SDL_MOUSEMOTION: (motion: TSDL_MouseMotionEvent);
+      SDL_KEYDOWN:                        (key: TSDL_KeyboardEvent);
+      SDL_TEXTEDITING:                    (edit: TSDL_TextEditingEvent);
+      SDL_TEXTINPUT:                      (text: TSDL_TextInputEvent);
+      SDL_MOUSEMOTION:                    (motion: TSDL_MouseMotionEvent);
       SDL_MOUSEBUTTONUP,
-      SDL_MOUSEBUTTONDOWN: (button: TSDL_MouseButtonEvent);
-      SDL_MOUSEWHEEL: (wheel: TSDL_MouseWheelEvent);
-      SDL_JOYAXISMOTION: (jaxis: TSDL_JoyAxisEvent);
-      SDL_JOYBALLMOTION: (jball: TSDL_JoyBallEvent);
-      SDL_JOYHATMOTION: (jhat: TSDL_JoyHatEvent);
+      SDL_MOUSEBUTTONDOWN:                (button: TSDL_MouseButtonEvent);
+      SDL_MOUSEWHEEL:                     (wheel: TSDL_MouseWheelEvent);
+      SDL_JOYAXISMOTION:                  (jaxis: TSDL_JoyAxisEvent);
+      SDL_JOYBALLMOTION:                  (jball: TSDL_JoyBallEvent);
+      SDL_JOYHATMOTION:                   (jhat: TSDL_JoyHatEvent);
       SDL_JOYBUTTONDOWN,
-      SDL_JOYBUTTONUP: (jbutton: TSDL_JoyButtonEvent);
+      SDL_JOYBUTTONUP:                    (jbutton: TSDL_JoyButtonEvent);
       SDL_JOYDEVICEADDED,
-      SDL_JOYDEVICEREMOVED: (jdevice: TSDL_JoyDeviceEvent);
-      SDL_CONTROLLERAXISMOTION: (caxis: TSDL_ControllerAxisEvent);
+      SDL_JOYDEVICEREMOVED:               (jdevice: TSDL_JoyDeviceEvent);
+      SDL_CONTROLLERAXISMOTION:           (caxis: TSDL_ControllerAxisEvent);
       SDL_CONTROLLERBUTTONUP,
-      SDL_CONTROLLERBUTTONDOWN: (cbutton: TSDL_ControllerButtonEvent);
+      SDL_CONTROLLERBUTTONDOWN:           (cbutton: TSDL_ControllerButtonEvent);
       SDL_CONTROLLERDEVICEADDED,
       SDL_CONTROLLERDEVICEREMOVED,
-      SDL_CONTROLLERDEVICEREMAPPED: (cdevice: TSDL_ControllerDeviceEvent);
-      SDL_QUITEV: (quit: TSDL_QuitEvent);
-      SDL_USEREVENT: (user: TSDL_UserEvent);
-      SDL_SYSWMEVENT: (syswm: TSDL_SysWMEvent);
+      SDL_CONTROLLERDEVICEREMAPPED:       (cdevice: TSDL_ControllerDeviceEvent);
+      SDL_QUITEV:                         (quit: TSDL_QuitEvent);
+      SDL_USEREVENT:                      (user: TSDL_UserEvent);
+      SDL_SYSWMEVENT:                     (syswm: TSDL_SysWMEvent);
       SDL_FINGERDOWN,
       SDL_FINGERUP,
-      SDL_FINGERMOTION: (tfinger: TSDL_TouchFingerEvent);
-      SDL_MULTIGESTURE: (mgesture: TSDL_MultiGestureEvent);
+      SDL_FINGERMOTION:                   (tfinger: TSDL_TouchFingerEvent);
+      SDL_MULTIGESTURE:                   (mgesture: TSDL_MultiGestureEvent);
       SDL_DOLLARGESTURE,SDL_DOLLARRECORD: (dgesture: TSDL_DollarGestureEvent);
-      SDL_DROPFILE: (drop: TSDL_DropEvent);
+      SDL_DROPFILE:                       (drop: TSDL_DropEvent);
   end;
 
   TSDL_eventaction = (
@@ -2700,7 +2702,7 @@ end;
 
 //=====SDL_EVENTS=====
 
-function SDL_GetEventState(type_: UInt32): Uint8;
+function SDL_GetEventState(type_: Uint32): Uint8;
 begin
   SDL_GetEventState:=SDL_EventState(type_, SDL_QUERY);
 end;
