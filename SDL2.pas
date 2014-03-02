@@ -520,9 +520,9 @@ function SDL_RWFromConstMem(const mem: pointer;
 function SDL_AllocRW: PSDL_RWops; lSDL;
 procedure SDL_FreeRW(area: PSDL_RWops); lSDL;
 
-function SDL_RWsize(ctx: PSDL_RWops): SInt64;
-function SDL_RWseek(ctx: PSDL_RWops; offset: SInt64; whence: longint): SInt64;
-function SDL_RWtell(ctx: PSDL_RWops): SInt64;
+function SDL_RWsize(ctx: PSDL_RWops): Sint64;
+function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64; whence: longint): Sint64;
+function SDL_RWtell(ctx: PSDL_RWops): Sint64;
 function SDL_RWread(ctx: PSDL_RWops; ptr: pointer;
                     size ,n: longword): longword;
 function SDL_RWwrite(ctx: PSDL_RWops; ptr: pointer;
@@ -1829,7 +1829,7 @@ function SDL_GetKeyFromScancode(scancode: TSDL_ScanCode): TSDL_KeyCode; lSDL;
 function SDL_GetScancodeFromKey(key: TSDL_KeyCode): TSDL_ScanCode; lSDL;
 function SDL_GetScancodeName(scancode: TSDL_ScanCode): pchar; lSDL;
 function SDL_GetScancodeFromName(const name: pchar): TSDL_ScanCode; lSDL;
-function SDL_GetKeyName(key: TSDL_ScanCode): pchar; lSDL;
+function SDL_GetKeyName(key: TSDL_KeyCode): pchar; lSDL;
 function SDL_GetKeyFromName(const name: pchar): TSDL_ScanCode; lSDL;
 procedure SDL_StartTextInput; lSDL;
 function SDL_IsTextInputActive: SDL_bool; lSDL;
@@ -2222,7 +2222,7 @@ function SDL_GetTouchFinger(touchID: TSDL_TouchID;
 //======SDL_GESTURE=====
 
 type
-  TSDL_GestureID = SInt64;
+  TSDL_GestureID = Sint64;
 
 function SDL_RecordGesture(touchId: TSDL_TouchID): longint; lSDL;
 function SDL_SaveAllDollarTemplates(src: PSDL_RWops): longint; lSDL;
@@ -2312,8 +2312,8 @@ type
     padding1: UInt8;
     padding2: UInt8;
     padding3: UInt8;
-    data1: SInt32;
-    data2: SInt32;
+    data1: Sint32;
+    data2: Sint32;
   end;
 
   TSDL_KeyboardEvent = record
@@ -2334,8 +2334,8 @@ type
     timestamp: Uint32;
     windowID: Uint32;
     text: array[0..SDL_TEXTEDITINGEVENT_TEXT_SIZE] of char;
-    start: SInt32;
-    length: SInt32;
+    start: Sint32;
+    length: Sint32;
   end;
 
 {$DEFINE SDL_TEXTINPUTEVENT_TEXT_SIZE:=32}
@@ -2353,10 +2353,10 @@ type
     windowID: Uint32;
     which: Uint32;
     state: Uint32;
-    x: SInt32;
-    y: SInt32;
-    xrel: SInt32;
-    yrel: SInt32;
+    x: Sint32;
+    y: Sint32;
+    xrel: Sint32;
+    yrel: Sint32;
   end;
 
   TSDL_MouseButtonEvent = record
@@ -2368,8 +2368,8 @@ type
     state: UInt8;
     padding1: UInt8;
     padding2: UInt8;
-    x: SInt32;
-    y: SInt32;
+    x: Sint32;
+    y: Sint32;
   end;
 
   TSDL_MouseWheelEvent = record
@@ -2377,8 +2377,8 @@ type
     timestamp: Uint32;
     windowID: Uint32;
     which: Uint32;
-    x: SInt32;
-    y: SInt32;
+    x: Sint32;
+    y: Sint32;
   end;
 
   TSDL_JoyAxisEvent = record
@@ -2428,7 +2428,7 @@ type
   TSDL_JoyDeviceEvent = record
     type_: Uint32;
     timestamp: Uint32;
-    which: SInt32;
+    which: Sint32;
   end;
 
   TSDL_ControllerAxisEvent = record
@@ -2456,7 +2456,7 @@ type
   TSDL_ControllerDeviceEvent = record
     type_: Uint32;
     timestamp: Uint32;
-    which: SInt32;
+    which: Sint32;
   end;
 
   TSDL_TouchFingerEvent = record
@@ -2514,7 +2514,7 @@ type
     type_: Uint32;
     timestamp: Uint32;
     windowID: Uint32;
-    code: SInt32;
+    code: Sint32;
     data1: pointer;
     data2: pointer;
   end;
@@ -2644,17 +2644,17 @@ end;
 
 //=====SDL_RWOPS=====
 
-function SDL_RWsize(ctx: PSDL_RWops): SInt64;
+function SDL_RWsize(ctx: PSDL_RWops): Sint64;
 begin
   SDL_RWsize:=ctx^.size(ctx);
 end;
 
-function SDL_RWseek(ctx: PSDL_RWops; offset: SInt64; whence: longint): SInt64;
+function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64; whence: longint): Sint64;
 begin
   SDL_RWseek:=ctx^.seek(ctx,offset,whence);
 end;
 
-function SDL_RWtell(ctx: PSDL_RWops): SInt64;
+function SDL_RWtell(ctx: PSDL_RWops): Sint64;
 begin
   SDL_RWtell:=ctx^.seek(ctx, 0, RW_SEEK_CUR);
 end;

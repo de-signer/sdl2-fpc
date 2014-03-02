@@ -1,5 +1,8 @@
 SDL2 headers for Free Pascal
 
+1.05 (02.03.14)
+  Fixed SDL_GetKeyName
+
 1.04 (07.01.14)
   Various small fixes
 
