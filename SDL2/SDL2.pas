@@ -38,6 +38,10 @@ interface
   {$linkframework OpenGL}
 {$ENDIF}
 
+{$IFNDEF WINDOWS} //STDIO disabled on WIN by default (see SDL_config_windows.h)
+  {$DEFINE HAVE_STDIO_H}
+{$ENDIF}
+
 //=====SDL_STDINC=====
 
 type
@@ -455,6 +459,56 @@ const
   RW_SEEK_END = 2;
 
 type
+  {$DEFINE REC_1:=0}
+  {$DEFINE REC_2:=1}
+  {$DEFINE REC_3:=2}
+
+  Thidden = record
+    case Uint32 of
+      {$IFDEF ANDROID}
+        {$DEFINE REC_1:=1}
+        {$DEFINE REC_2:=2}
+        {$DEFINE REC_3:=3}
+      0: (androidio: record
+            fileNameRef,
+            inputStreamRef,
+            readableByteChannelRef,
+            readMethod,
+            assetFileDescriptorRef: pointer;
+            position,
+            size,
+            offset,
+            fd: longint;
+          end;);
+      {$ENDIF}
+      {$IFDEF WINDOWS}
+      0: (windowsio: record
+            append: SDL_bool;
+            h: pointer;
+            buffer: record
+              data: pointer;
+              size: longword;
+              left: longword;
+            end;
+          end;);
+      {$ENDIF}
+      {$IFDEF HAVE_STDIO_H} //stdio not available on Windows
+      REC_1: (stdio: record
+            autoclose: SDL_bool;
+            fp: pointer;
+          end;);
+      {$ENDIF}
+      REC_2: (mem: record
+            base,
+            here,
+            stop: PUint8;
+          end;);
+      REC_3: (unknown: record
+            data1,
+            data2: pointer;
+          end;);
+  end;
+
   PSDL_RWops = ^TSDL_RWops;
   TSDL_RWops = record
     size: function(context: PSDL_RWops): Sint64; cdecl;
@@ -471,48 +525,12 @@ type
                     num: longword): longword; cdecl;
     close: function(context: PSDL_RWops): longint; cdecl;
     type_: Uint32;
-  case integer of
-    0: (stdio: record
-          autoclose: SDL_bool;
-          fp: file;
-        end;);
-    1: (mem: record
-          base: PUint8;
-          here: PUint8;
-          stop: PUint8;
-        end;);
-    2: (unknown: record
-          data1,
-          data2: pointer;
-        end;);
-    {$IFDEF ANDROID}
-    3: (androidio: record
-          fileNameRef: Pointer;
-          inputStreamRef: Pointer;
-          readableByteChannelRef: Pointer;
-          readMethod: Pointer;
-          assetFileDescriptorRef: Pointer;
-          position: longint;
-          size: longint;
-          offset: longint;
-          fd: longint;
-        end;);
-    {$ENDIF}
-    {$IFDEF WINDOWS}
-    3: (windowsio: record
-          append: SDL_bool;
-          h: Pointer;
-          buffer: record
-            data: pointer;
-            size: longword;
-            left: longword;
-          end;
-        end;);
-    {$ENDIF}
+    hidden: Thidden;
   end;
 
 function SDL_RWFromFile(const _file: pchar;
                         const mode: pchar): PSDL_RWops; lSDL;
+function SDL_RWFromFP(fp: pointer; autoclose: SDL_bool): PSDL_RWops; lSDL;
 function SDL_RWFromMem(mem: pointer; size: longint): PSDL_RWops; lSDL;
 function SDL_RWFromConstMem(const mem: pointer;
                             size: longint): PSDL_RWops; lSDL;
@@ -2706,6 +2724,5 @@ function SDL_GetEventState(type_: Uint32): Uint8;
 begin
   SDL_GetEventState:=SDL_EventState(type_, SDL_QUERY);
 end;
-
 
 end.

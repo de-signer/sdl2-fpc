@@ -1,5 +1,9 @@
 SDL2 headers for Free Pascal
 
+1.06 (06.03.14)
+  Fixed SDL_RWops record
+  Function SDL_RWFromFP added
+
 1.05 (02.03.14)
   Fixed SDL_GetKeyName
 
