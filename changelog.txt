@@ -1,5 +1,8 @@
 SDL2 headers for Free Pascal
 
+1.07 (10.03.14)
+  SDL 2.0.2
+
 1.06 (06.03.14)
   Fixed SDL_RWops record
   Function SDL_RWFromFP added

@@ -6,6 +6,7 @@
 =====
 
   SDL2_net header translation for Free Pascal
+  https://bitbucket.org/p_daniel/sdl-2-for-free-pascal-compiler
 
 =====
 

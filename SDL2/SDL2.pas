@@ -5,6 +5,7 @@
 =====
 
   SDL2 headers translation for Free Pascal
+  https://bitbucket.org/p_daniel/sdl-2-for-free-pascal-compiler
 
 =====
 
@@ -12,6 +13,7 @@
     • SDL_atomic
     • SDL_assert
     • SDL_main
+    • SDL_syswm
     • SDL_endian:
         SDL_(LIL/BIG)_ENDIAN -> FPC_(LITTLE/BIG)_ENDIAN (or ENDIAN_(LITTLE/BIG))
         SDL_SwapXX -> SwapEndian/LEToN/BEToN/NToLE/NToBE
@@ -63,7 +65,7 @@ type
   PSint64 = ^Sint64;
   Sint64 = int64;
 
-  //size_t = longword;
+  size_t = longword;
 
   TSDL_iconv_t = pointer;
 
@@ -143,6 +145,8 @@ function SDL_snprintf(text: pchar; maxlen: longword;
 
 function SDL_abs(x: longint): longint; lSDL;
 
+function SDL_acos(x: double): double; lSDL;
+function SDL_asin(x: double): double; lSDL;
 function SDL_atan(x: double): double; lSDL;
 function SDL_atan2(x, y: double): double; lSDL;
 function SDL_ceil(x: double): double; lSDL;
@@ -198,7 +202,7 @@ procedure SDL_Quit; lSDL;
 const
   SDL_MAJOR_VERSION = 2;
   SDL_MINOR_VERSION = 0;
-  SDL_PATCHLEVEL    = 1;
+  SDL_PATCHLEVEL    = 2;
 
 type
   PSDL_version = ^TSDL_version;
@@ -284,19 +288,26 @@ const
   SDL_HINT_RENDER_DIRECT3D_THREADSAFE = 'SDL_RENDER_DIRECT3D_THREADSAFE';
   SDL_HINT_RENDER_SCALE_QUALITY = 'SDL_RENDER_SCALE_QUALITY';
   SDL_HINT_RENDER_VSYNC = 'SDL_RENDER_VSYNC';
+  SDL_HINT_VIDEO_ALLOW_SCREENSAVER = 'SDL_VIDEO_ALLOW_SCREENSAVER';
   SDL_HINT_VIDEO_X11_XVIDMODE = 'SDL_VIDEO_X11_XVIDMODE';
   SDL_HINT_VIDEO_X11_XINERAMA = 'SDL_VIDEO_X11_XINERAMA';
   SDL_HINT_VIDEO_X11_XRANDR = 'SDL_VIDEO_X11_XRANDR';
   SDL_HINT_GRAB_KEYBOARD = 'SDL_GRAB_KEYBOARD';
+  SDL_HINT_MOUSE_RELATIVE_MODE_WARP = 'SDL_MOUSE_RELATIVE_MODE_WARP';
   SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS = 'SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS';
   SDL_HINT_IDLE_TIMER_DISABLED = 'SDL_IOS_IDLE_TIMER_DISABLED';
   SDL_HINT_ORIENTATIONS = 'SDL_IOS_ORIENTATIONS';
+  SDL_HINT_ACCELEROMETER_AS_JOYSTICK = 'SDL_ACCELEROMETER_AS_JOYSTICK';
   SDL_HINT_XINPUT_ENABLED = 'SDL_XINPUT_ENABLED';
   SDL_HINT_GAMECONTROLLERCONFIG = 'SDL_GAMECONTROLLERCONFIG';
   SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS = 'SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS';
   SDL_HINT_ALLOW_TOPMOST = 'SDL_ALLOW_TOPMOST';
   SDL_HINT_TIMER_RESOLUTION = 'SDL_TIMER_RESOLUTION';
   SDL_HINT_VIDEO_HIGHDPI_DISABLED = 'SDL_VIDEO_HIGHDPI_DISABLED';
+  SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK = 'SDL_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK';
+  SDL_HINT_VIDEO_WIN_D3DCOMPILER = 'SDL_VIDEO_WIN_D3DCOMPILER';
+  SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT = 'SDL_VIDEO_WINDOW_SHARE_PIXEL_FORMAT';
+  SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES = 'SDL_VIDEO_MAC_FULLSCREEN_SPACES';
 
 type
   TSDL_HintPriority = (
@@ -332,6 +343,7 @@ function SDL_HasSSE2: SDL_bool; lSDL;
 function SDL_HasSSE3: SDL_bool; lSDL;
 function SDL_HasSSE41: SDL_bool; lSDL;
 function SDL_HasSSE42: SDL_bool; lSDL;
+function SDL_HasAVX: SDL_bool; lSDL;
 function SDL_GetSystemRAM: longint; lSDL;
 
 //=====SDL_CLIPBOARD=====
@@ -437,6 +449,7 @@ function SDL_ThreadID: TSDL_threadID; lSDL;
 function SDL_GetThreadID(thread: PSDL_Thread): TSDL_threadID; lSDL;
 function SDL_SetThreadPriority(priority: TSDL_ThreadPriority): longint; lSDL;
 procedure SDL_WaitThread(thread: PSDL_Thread; status: plongint); lSDL;
+procedure SDL_DetachThread(thread: PSDL_Thread); lSDL;
 
 function SDL_TLSCreate: TSDL_TLSID; lSDL;
 function SDL_TLSGet(id: TSDL_TLSID): pointer; lSDL;
@@ -520,7 +533,7 @@ type
                    size,
                    maxnum: longword): longword; cdecl;
     write: function(context: PSDL_RWops;
-                    const ptr: Pointer;
+                    const ptr: pointer;
                     size,
                     num: longword): longword; cdecl;
     close: function(context: PSDL_RWops): longint; cdecl;
@@ -1181,6 +1194,7 @@ function SDL_GL_LoadLibrary(const path: pchar): longint; lSDL;
 function SDL_GL_GetProcAddress(const proc:  pchar): pointer; lSDL;
 procedure SDL_GL_UnloadLibrary; lSDL;
 function SDL_GL_ExtensionSupported(const extension: pchar): SDL_bool; lSDL;
+procedure SDL_GL_ResetAttributes; lSDL;
 function SDL_GL_SetAttribute(attr: SDL_GLattr; value: longint): longint; lSDL;
 function SDL_GL_GetAttribute(attr: SDL_GLattr; value: plongint): longint; lSDL;
 function SDL_GL_CreateContext(window: PSDL_Window): SDL_GLContext; lSDL;
@@ -2010,6 +2024,19 @@ type
           end);
   end;
 
+//https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
+function SDL_GameControllerAddMappingsFromRW(rw: PSDL_RWops;
+                                             freerw: longint): longint; lSDL;
+function SDL_GameControllerAddMappingsFromFile(_file: pchar): longint;
+
+{
+This string shows an example of a valid mapping for a controller
+  '341a3608000000000000504944564944,Afterglow PS3 Controller,
+  a:b1,b:b2,y:b3,x:b0,start:b9,guide:b12,back:b8,dpup:h0.1,dpleft:h0.8,
+  dpdown:h0.4,dpright:h0.2,leftshoulder:b4,rightshoulder:b5,leftstick:b10,
+  rightstick:b11,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,
+  righttrigger:b7'
+}
 function SDL_GameControllerAddMapping(mapping: pchar): longint; lSDL;
 function SDL_GameControllerMappingForGUID(guid: TSDL_JoystickGUID): pchar; lSDL;
 function SDL_GameControllerMapping(gamecontroller: PSDL_GameController): pchar; lSDL;
@@ -2304,6 +2331,7 @@ const
   SDL_CLIPBOARDUPDATE = $900;
 
   SDL_DROPFILE        = $1000;
+  RENDER_TARGETS_RESET= $2000;
 
   SDL_USEREVENT    = $8000;
 
@@ -2384,8 +2412,8 @@ type
     which: Uint32;
     button: UInt8;
     state: UInt8;
+    clicks: UInt8;
     padding1: UInt8;
-    padding2: UInt8;
     x: Sint32;
     y: Sint32;
   end;
@@ -2620,6 +2648,8 @@ function SDL_RegisterEvents(numevents: longint): Uint32; lSDL;
 {$IFDEF WINDOWS}
 function SDL_Direct3D9GetAdapterIndex(displayIndex: longint): longint; lSDL;
 function SDL_RenderGetD3D9Device(renderer: PSDL_Renderer): pointer; lSDL;
+procedure SDL_DXGIGetOutputInfo(displayIndex: longint;
+                                adapterIndex, outputIndex: plongint); lSDL;
 {$ENDIF}
 
 {$IFDEF IPHONEOS}
@@ -2716,6 +2746,14 @@ end;
 function SDL_SaveBMP(surface: PSDL_Surface; _file: pchar): longint;
 begin
   SDL_SaveBMP:=SDL_SaveBMP_RW(surface, SDL_RWFromFile(_file, 'w'), 1);
+end;
+
+//=====SDL_GAMECONTROLLER=====
+
+function SDL_GameControllerAddMappingsFromFile(_file: pchar): longint;
+begin
+  SDL_GameControllerAddMappingsFromFile:=SDL_GameControllerAddMappingsFromRW(
+    SDL_RWFromFile(_file, 'r'), 1);
 end;
 
 //=====SDL_EVENTS=====
