@@ -500,7 +500,7 @@ type
             h: pointer;
             buffer: record
               data: pointer;
-              size: longword;
+              size,
               left: longword;
             end;
           end;);
@@ -628,9 +628,9 @@ type
   TSDL_AudioSpec = record
     freq: longint;
     format: TSDL_AudioFormat;
-    channels: Uint8;
+    channels,
     silence: Uint8;
-    samples: Uint16;
+    samples,
     padding: Uint16;
     size: Uint32;
     callback: TSDL_AudioCallback;
@@ -644,12 +644,12 @@ type
 
   TSDL_AudioCVT = record
     needed: longint;
-    src_format: TSDL_AudioFormat;
+    src_format,
     dst_format: TSDL_AudioFormat;
     rate_incr: double;
     buf: PUint8;
-    len: longint;
-    len_cvt: longint;
+    len,
+    len_cvt,
     len_mult: longint;
     len_ratio: double;
     filters: array[0..9] of TSDL_AudioFilter;
@@ -824,20 +824,20 @@ type
   TSDL_PixelFormat = record
     format: Uint32;
     palette: PSDL_Palette;
-    BitsPerPixel: Uint8;
+    BitsPerPixel,
     BytesPerPixel: Uint8;
     padding: array[0..1] of Uint8;
-    Rmask: Uint32;
-    Gmask: Uint32;
-    Bmask: Uint32;
+    Rmask,
+    Gmask,
+    Bmask,
     Amask: Uint32;
-    Rloss: Uint8;
-    Gloss: Uint8;
-    Bloss: Uint8;
+    Rloss,
+    Gloss,
+    Bloss,
     Aloss: Uint8;
-    Rshift: Uint8;
-    Gshift: Uint8;
-    Bshift: Uint8;
+    Rshift,
+    Gshift,
+    Bshift,
     Ashift: Uint8;
     refcount: longint;
     next: PSDL_PixelFormat;
@@ -878,13 +878,12 @@ procedure SDL_CalculateGammaRamp(gamma: single; ramp: PUint16); lSDL;
 type
   PSDL_Point = ^TSDL_Point;
   TSDL_Point = record
-    x: longint;
-    y: longint;
+    x, y: longint;
   end;
 
   PSDL_Rect = ^TSDL_Rect;
   TSDL_Rect = record
-    x, y: longint;
+    x, y,
     w, h: longint;
   end;
 
@@ -923,9 +922,9 @@ type
   TSDL_Surface = record
     flags: Uint32;
     format: PSDL_PixelFormat;
-    w, h: longint;
+    w, h,
     pitch: longint;
-    pixels: pointer;
+    pixels,
     userdata: pointer;
     locked: longint;
     lock_data: pointer;
@@ -1076,8 +1075,7 @@ type
   PSDL_DisplayMode = ^TSDL_DisplayMode;
   TSDL_DisplayMode = record
     format: Uint32;
-    w,
-    h,
+    w, h,
     refresh_rate: longint;
     driverdata: pointer;
   end;
@@ -1268,7 +1266,7 @@ type
     flags: Uint32;
     num_texture_formats: Uint32;
     texture_formats: array[0..15] of Uint32;
-    max_texture_width: longint;
+    max_texture_width,
     max_texture_height: longint;
   end;
 
@@ -1436,7 +1434,7 @@ type
   TSDL_MessageBoxData = record
     flags: Uint32;
     window: PSDL_Window;
-    title: pchar;
+    title,
     message: pchar;
     numbuttons: longint;
     buttons: PSDL_MessageBoxButtonData;
@@ -2019,7 +2017,7 @@ type
       1: (button: longint);
       2: (axis: longint);
       3: (value: record
-            hat: longint;
+            hat,
             hat_mask: longint;
           end);
   end;
@@ -2102,13 +2100,13 @@ type
     type_: Uint16;
     direction: TSDL_HapticDirection;
     length: Uint32;
-    delay: Uint16;
-    button: Uint16;
+    delay,
+    button,
     interval: Uint16;
     level: Sint16;
-    attack_length: Uint16;
-    attack_level: Uint16;
-    fade_length: Uint16;
+    attack_length,
+    attack_level,
+    fade_length,
     fade_level: Uint16;
   end;
 
@@ -2117,16 +2115,16 @@ type
     type_: Uint16;
     direction: TSDL_HapticDirection;
     length: Uint32;
-    delay: Uint16;
-    button: Uint16;
-    interval: Uint16;
+    delay,
+    button,
+    interval,
     period: Uint16;
-    magnitude: Sint16;
+    magnitude,
     offset: Sint16;
     phase: Uint16;
-    attack_length: Uint16;
-    attack_level: Uint16;
-    fade_length: Uint16;
+    attack_length,
+    attack_level,
+    fade_length,
     fade_level: Uint16;
   end;
 
@@ -2135,8 +2133,8 @@ type
     type_: Uint16;
     direction: TSDL_HapticDirection;
     length: Uint32;
-    delay: Uint16;
-    button: Uint16;
+    delay,
+    button,
     interval: Uint16;
     right_sat: array[0..2] of Uint16;
     left_sat: array[0..2] of Uint16;
@@ -2151,14 +2149,14 @@ type
     type_: Uint16;
     direction: TSDL_HapticDirection;
     length: Uint32;
-    delay: Uint16;
-    button: Uint16;
+    delay,
+    button,
     interval: Uint16;
-    start: Sint16;
+    start,
     end_: Sint16;
-    attack_length: Uint16;
-    attack_level: Uint16;
-    fade_length: Uint16;
+    attack_length,
+    attack_level,
+    fade_length,
     fade_level: Uint16;
   end;
 
@@ -2166,7 +2164,7 @@ type
   TSDL_HapticLeftRight = record
     type_: Uint16;
     length: Uint32;
-    large_magnitude: Uint16;
+    large_magnitude,
     small_magnitude: Uint16;
   end;
 
@@ -2175,16 +2173,16 @@ type
     type_: Uint16;
     direction: TSDL_HapticDirection;
     length: Uint32;
-    delay: Uint16;
-    button: Uint16;
+    delay,
+    button,
     interval: Uint16;
     channels: Uint8;
-    period: Uint16;
+    period,
     samples: Uint16;
     data: PUint16;
-    attack_length: Uint16;
-    attack_level: Uint16;
-    fade_length: Uint16;
+    attack_length,
+    attack_level,
+    fade_length,
     fade_level: Uint16;
   end;
 
@@ -2250,8 +2248,7 @@ type
   PSDL_Finger = ^TSDL_Finger;
   TSDL_Finger = record
     id: TSDL_FingerID;
-    x: single;
-    y: single;
+    x, y,
     pressure: single;
   end;
 
@@ -2331,7 +2328,7 @@ const
   SDL_CLIPBOARDUPDATE = $900;
 
   SDL_DROPFILE        = $1000;
-  RENDER_TARGETS_RESET= $2000;
+  SDL_RENDER_TARGETS_RESET = $2000;
 
   SDL_USEREVENT    = $8000;
 
@@ -2346,29 +2343,29 @@ type
   TSDL_EventType = longword;
 
   TSDL_CommonEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
   end;
 
   TSDL_WindowEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
+    type_,
+    timestamp,
     windowID: Uint32;
-    event: UInt8;
-    padding1: UInt8;
-    padding2: UInt8;
+    event,
+    padding1,
+    padding2,
     padding3: UInt8;
-    data1: Sint32;
+    data1,
     data2: Sint32;
   end;
 
   TSDL_KeyboardEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
+    type_,
+    timestamp,
     windowID: Uint32;
-    state: UInt8;
-    _repeat: UInt8;
-    padding2: UInt8;
+    state,
+    _repeat,
+    padding2,
     padding3: UInt8;
     keysym: TSDL_KeySym;
   end;
@@ -2376,197 +2373,197 @@ type
 {$DEFINE SDL_TEXTEDITINGEVENT_TEXT_SIZE:=32}
 
   TSDL_TextEditingEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
+    type_,
+    timestamp,
     windowID: Uint32;
     text: array[0..SDL_TEXTEDITINGEVENT_TEXT_SIZE] of char;
-    start: Sint32;
+    start,
     length: Sint32;
   end;
 
 {$DEFINE SDL_TEXTINPUTEVENT_TEXT_SIZE:=32}
 
   TSDL_TextInputEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
+    type_,
+    timestamp,
     windowID: Uint32;
     text: array[0..SDL_TEXTINPUTEVENT_TEXT_SIZE] of char;
   end;
 
   TSDL_MouseMotionEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
-    windowID: Uint32;
-    which: Uint32;
+    type_,
+    timestamp,
+    windowID,
+    which,
     state: Uint32;
-    x: Sint32;
-    y: Sint32;
-    xrel: Sint32;
+    x,
+    y,
+    xrel,
     yrel: Sint32;
   end;
 
   TSDL_MouseButtonEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
-    windowID: Uint32;
+    type_,
+    timestamp,
+    windowID,
     which: Uint32;
-    button: UInt8;
-    state: UInt8;
-    clicks: UInt8;
+    button,
+    state,
+    clicks,
     padding1: UInt8;
-    x: Sint32;
+    x,
     y: Sint32;
   end;
 
   TSDL_MouseWheelEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
-    windowID: Uint32;
+    type_,
+    timestamp,
+    windowID,
     which: Uint32;
-    x: Sint32;
+    x,
     y: Sint32;
   end;
 
   TSDL_JoyAxisEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: TSDL_JoystickID;
-    axis: UInt8;
-    padding1: UInt8;
-    padding2: UInt8;
+    axis,
+    padding1,
+    padding2,
     padding3: UInt8;
-    value: SInt16;
+    value,
     padding4: UInt16;
   end;
 
   TSDL_JoyBallEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: TSDL_JoystickID;
-    ball: UInt8;
-    padding1: UInt8;
-    padding2: UInt8;
+    ball,
+    padding1,
+    padding2,
     padding3: UInt8;
-    xrel: SInt16;
+    xrel,
     yrel: SInt16;
   end;
 
   TSDL_JoyHatEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: TSDL_JoystickID;
-    hat: UInt8;
-    value: UInt8;
-    padding1: UInt8;
+    hat,
+    value,
+    padding1,
     padding2: UInt8;
   end;
 
   TSDL_JoyButtonEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: TSDL_JoystickID;
-    button: UInt8;
-    state: UInt8;
-    padding1: UInt8;
+    button,
+    state,
+    padding1,
     padding2: UInt8;
   end;
 
   TSDL_JoyDeviceEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: Sint32;
   end;
 
   TSDL_ControllerAxisEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: TSDL_JoystickID;
-    axis: UInt8;
-    padding1: UInt8;
-    padding2: UInt8;
+    axis,
+    padding1,
+    padding2,
     padding3: UInt8;
     value: SInt16;
     padding4: UInt16;
   end;
 
   TSDL_ControllerButtonEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: TSDL_JoystickID;
-    button: UInt8;
-    state: UInt8;
-    padding1: UInt8;
+    button,
+    state,
+    padding1,
     padding2: UInt8;
   end;
 
   TSDL_ControllerDeviceEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     which: Sint32;
   end;
 
   TSDL_TouchFingerEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     touchId: TSDL_TouchID;
     fingerId: TSDL_FingerID;
-    x: single;
-    y: single;
-    dx: single;
-    dy: single;
+    x,
+    y,
+    dx,
+    dy,
     pressure: single;
   end;
 
   TSDL_MultiGestureEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     touchId: TSDL_TouchID;
-    dTheta: single;
-    dDist: single;
-    x: single;
+    dTheta,
+    dDist,
+    x,
     y: single;
-    numFingers: UInt16;
+    numFingers,
     padding: UInt16;
   end;
 
   TSDL_DollarGestureEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     touchId: TSDL_TouchID;
     gestureId: TSDL_GestureID;
     numFingers: Uint32;
-    error: single;
-    x: single;
+    error,
+    x,
     y: single;
   end;
 
   TSDL_DropEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     _file: pchar;
   end;
 
   TSDL_QuitEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
   end;
 
   TSDL_OSEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
   end;
 
   TSDL_UserEvent = record
-    type_: Uint32;
-    timestamp: Uint32;
+    type_,
+    timestamp,
     windowID: Uint32;
     code: Sint32;
-    data1: pointer;
+    data1,
     data2: pointer;
   end;
 
   TSDL_SysWMEvent = record
-    type_: Uint32;
+    type_,
     timestamp: Uint32;
     msg: pointer;
   end;
@@ -2728,7 +2725,7 @@ end;
 
 function SDL_RectEmpty(const x: PSDL_Rect): SDL_bool;
 begin
-  SDL_RectEmpty:=(x^.w <= 0) or (x^.h <= 0);
+  SDL_RectEmpty:=(x^.w<=0) or (x^.h<=0);
 end;
 
 function SDL_RectEquals(const a, b: PSDL_Rect): SDL_bool;
