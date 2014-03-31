@@ -1,5 +1,11 @@
 SDL2 headers for Free Pascal
 
+1.08 (30.03.14)
+  SDL 2.0.3
+  Fixed size_t
+  Fixed SDL_GameControllerButtonBind record
+  Other small fixes and cleanups
+
 1.07 (10.03.14)
   SDL 2.0.2
 

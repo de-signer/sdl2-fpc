@@ -48,32 +48,25 @@ interface
 
 type
   SDL_bool = longbool;
-
   PSint8 = ^Sint8;
   Sint8 = shortint;
-  PUint8 = ^Uint8; //byte
-
+  PUint8 = ^Uint8;
   PSint16 = ^Sint16;
   Sint16 = smallint;
-  PUint16 = ^Uint16; //word
-
+  PUint16 = ^Uint16;
   Sint32 = longint;
   PUint32 = ^Uint32; //longword
-
   PUint64 = ^Uint64; //qword
-
   PSint64 = ^Sint64;
   Sint64 = int64;
-
-  size_t = longword;
-
+  size_t = PtrUInt;
+  psize_t = ^size_t;
   TSDL_iconv_t = pointer;
-
   pwchar_t = plongint;
 
-function SDL_malloc(size: longword): pointer; lSDL;
-function SDL_calloc(nmemb: longword; size: longword): pointer; lSDL;
-function SDL_realloc(mem: pointer; size: longword): pointer; lSDL;
+function SDL_malloc(size: size_t): pointer; lSDL;
+function SDL_calloc(nmemb, size: size_t): pointer; lSDL;
+function SDL_realloc(mem: pointer; size: size_t): pointer; lSDL;
 procedure SDL_free(mem: pointer); lSDL;
 
 function SDL_getenv(name: pchar): pchar; lSDL;
@@ -85,28 +78,28 @@ type
   comparefn = function(a1, a2: pointer): longint; cdecl;
 
 procedure SDL_qsort(base: pointer;
-                    nmemb, size: longword; compare: comparefn); lSDL;
+                    nmemb, size: size_t; compare: comparefn); lSDL;
 
-function SDL_memset(dst: pointer; c: longint; len: longword): pointer; lSDL;
+function SDL_memset(dst: pointer; c: longint; len: size_t): pointer; lSDL;
 function SDL_memcpy(dst: pointer; const src: pointer;
-                    len: longword): pointer; lSDL;
+                    len: size_t): pointer; lSDL;
 function SDL_memmove(dst: pointer; const src: pointer;
-                     len: longword): pointer; lSDL;
-function SDL_memcmp(const s1, s2: pointer; len: longword): longint; lSDL;
+                     len: size_t): pointer; lSDL;
+function SDL_memcmp(const s1, s2: pointer; len: size_t): longint; lSDL;
 
-function SDL_wcslen(const wstr: pwchar_t): longword; lSDL;
+function SDL_wcslen(const wstr: pwchar_t): size_t; lSDL;
 function SDL_wcslcpy(dst: pwchar_t; const src: pwchar_t;
-                     maxlen: longword): longword; lSDL;
+                     maxlen: size_t): size_t; lSDL;
 function SDL_wcslcat(dst: pwchar_t; const src: pwchar_t;
-                     maxlen: longword): longword; lSDL;
+                     maxlen: size_t): size_t; lSDL;
 
-function SDL_strlen(const str: pchar): longword; lSDL;
+function SDL_strlen(const str: pchar): size_t; lSDL;
 function SDL_strlcpy(dst: pchar; const src: pchar;
-                     maxlen: longword): longword; lSDL;
+                     maxlen: size_t): size_t; lSDL;
 function SDL_utf8strlcpy(dst: pchar; const src: pchar;
-                         dst_bytes: longword): longword; lSDL;
+                         dst_bytes: size_t): size_t; lSDL;
 function SDL_strlcat(dst: pchar; const src: pchar;
-                     maxlen: longword): longword; lSDL;
+                     maxlen: size_t): size_t; lSDL;
 function SDL_strdup(const str: pchar): pchar; lSDL;
 function SDL_strrev(str: pchar): pchar; lSDL;
 function SDL_strupr(str: pchar): pchar; lSDL;
@@ -135,12 +128,12 @@ function SDL_strtoull(const str: pchar; endp: ppchar;
 function SDL_strtod(const str: pchar; endp: ppchar): double; lSDL;
 
 function SDL_strcmp(const str1, str2: pchar): longint; lSDL;
-function SDL_strncmp(const str1, str2: pchar; maxlen: longword): longint; lSDL;
+function SDL_strncmp(const str1, str2: pchar; maxlen: size_t): longint; lSDL;
 function SDL_strcasecmp(const str1, str2: pchar): longint; lSDL;
-function SDL_strncasecmp(const str1, str2: pchar; len: longword): longint; lSDL;
+function SDL_strncasecmp(const str1, str2: pchar; len: size_t): longint; lSDL;
 
 function SDL_sscanf(const text, fmt: pchar): longint; lSDL; varargs;
-function SDL_snprintf(text: pchar; maxlen: longword;
+function SDL_snprintf(text: pchar; maxlen: size_t;
                       const fmt: pchar): longint; lSDL; varargs;
 
 function SDL_abs(x: longint): longint; lSDL;
@@ -166,13 +159,13 @@ function SDL_iconv_open(const tocode, fromcode: pchar): TSDL_iconv_t; lSDL;
 function SDL_iconv_close(cd: TSDL_iconv_t): longint; lSDL;
 function SDL_iconv(cd: TSDL_iconv_t;
                    const inbuf: ppchar;
-                   inbytesleft: plongword;
+                   inbytesleft: psize_t;
                    outbuf: ppchar;
-                   outbytesleft: plongword): longword; lSDL;
+                   outbytesleft: psize_t): size_t; lSDL;
 function SDL_iconv_string(const tocode,
                           fromcode,
                           inbuf: pchar;
-                          inbytesleft: longword): pchar; lSDl;
+                          inbytesleft: size_t): pchar; lSDl;
 
 //=====SDL=====
 
@@ -184,11 +177,11 @@ const
   SDL_INIT_HAPTIC         = $00001000;
   SDL_INIT_GAMECONTROLLER = $00002000;
   SDL_INIT_NOPARACHUTE    = $00100000;
-  SDL_INIT_EVERYTHING = SDL_INIT_TIMER    or
-                        SDL_INIT_AUDIO    or
-                        SDL_INIT_VIDEO    or
+  SDL_INIT_EVERYTHING = SDL_INIT_TIMER or
+                        SDL_INIT_AUDIO or
+                        SDL_INIT_VIDEO or
                         SDL_INIT_JOYSTICK or
-                        SDL_INIT_HAPTIC   or
+                        SDL_INIT_HAPTIC or
                         SDL_INIT_GAMECONTROLLER;
 
 function SDL_Init(flags: Uint32): longint; lSDL;
@@ -202,7 +195,7 @@ procedure SDL_Quit; lSDL;
 const
   SDL_MAJOR_VERSION = 2;
   SDL_MINOR_VERSION = 0;
-  SDL_PATCHLEVEL    = 2;
+  SDL_PATCHLEVEL    = 3;
 
 type
   PSDL_version = ^TSDL_version;
@@ -282,32 +275,32 @@ procedure SDL_LogSetOutputFunction(callback: TSDL_LogOutputFunction;
 //=====SDL_HINTS=====
 
 const
-  SDL_HINT_FRAMEBUFFER_ACCELERATION = 'SDL_FRAMEBUFFER_ACCELERATION';
-  SDL_HINT_RENDER_DRIVER = 'SDL_RENDER_DRIVER';
-  SDL_HINT_RENDER_OPENGL_SHADERS = 'SDL_RENDER_OPENGL_SHADERS';
-  SDL_HINT_RENDER_DIRECT3D_THREADSAFE = 'SDL_RENDER_DIRECT3D_THREADSAFE';
-  SDL_HINT_RENDER_SCALE_QUALITY = 'SDL_RENDER_SCALE_QUALITY';
-  SDL_HINT_RENDER_VSYNC = 'SDL_RENDER_VSYNC';
-  SDL_HINT_VIDEO_ALLOW_SCREENSAVER = 'SDL_VIDEO_ALLOW_SCREENSAVER';
-  SDL_HINT_VIDEO_X11_XVIDMODE = 'SDL_VIDEO_X11_XVIDMODE';
-  SDL_HINT_VIDEO_X11_XINERAMA = 'SDL_VIDEO_X11_XINERAMA';
-  SDL_HINT_VIDEO_X11_XRANDR = 'SDL_VIDEO_X11_XRANDR';
-  SDL_HINT_GRAB_KEYBOARD = 'SDL_GRAB_KEYBOARD';
-  SDL_HINT_MOUSE_RELATIVE_MODE_WARP = 'SDL_MOUSE_RELATIVE_MODE_WARP';
-  SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS = 'SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS';
-  SDL_HINT_IDLE_TIMER_DISABLED = 'SDL_IOS_IDLE_TIMER_DISABLED';
-  SDL_HINT_ORIENTATIONS = 'SDL_IOS_ORIENTATIONS';
-  SDL_HINT_ACCELEROMETER_AS_JOYSTICK = 'SDL_ACCELEROMETER_AS_JOYSTICK';
-  SDL_HINT_XINPUT_ENABLED = 'SDL_XINPUT_ENABLED';
-  SDL_HINT_GAMECONTROLLERCONFIG = 'SDL_GAMECONTROLLERCONFIG';
-  SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS = 'SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS';
-  SDL_HINT_ALLOW_TOPMOST = 'SDL_ALLOW_TOPMOST';
-  SDL_HINT_TIMER_RESOLUTION = 'SDL_TIMER_RESOLUTION';
-  SDL_HINT_VIDEO_HIGHDPI_DISABLED = 'SDL_VIDEO_HIGHDPI_DISABLED';
-  SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK = 'SDL_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK';
-  SDL_HINT_VIDEO_WIN_D3DCOMPILER = 'SDL_VIDEO_WIN_D3DCOMPILER';
-  SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT = 'SDL_VIDEO_WINDOW_SHARE_PIXEL_FORMAT';
-  SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES = 'SDL_VIDEO_MAC_FULLSCREEN_SPACES';
+  SDL_HINT_FRAMEBUFFER_ACCELERATION='SDL_FRAMEBUFFER_ACCELERATION';
+  SDL_HINT_RENDER_DRIVER='SDL_RENDER_DRIVER';
+  SDL_HINT_RENDER_OPENGL_SHADERS='SDL_RENDER_OPENGL_SHADERS';
+  SDL_HINT_RENDER_DIRECT3D_THREADSAFE='SDL_RENDER_DIRECT3D_THREADSAFE';
+  SDL_HINT_RENDER_SCALE_QUALITY='SDL_RENDER_SCALE_QUALITY';
+  SDL_HINT_RENDER_VSYNC='SDL_RENDER_VSYNC';
+  SDL_HINT_VIDEO_ALLOW_SCREENSAVER='SDL_VIDEO_ALLOW_SCREENSAVER';
+  SDL_HINT_VIDEO_X11_XVIDMODE='SDL_VIDEO_X11_XVIDMODE';
+  SDL_HINT_VIDEO_X11_XINERAMA='SDL_VIDEO_X11_XINERAMA';
+  SDL_HINT_VIDEO_X11_XRANDR='SDL_VIDEO_X11_XRANDR';
+  SDL_HINT_GRAB_KEYBOARD='SDL_GRAB_KEYBOARD';
+  SDL_HINT_MOUSE_RELATIVE_MODE_WARP='SDL_MOUSE_RELATIVE_MODE_WARP';
+  SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS='SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS';
+  SDL_HINT_IDLE_TIMER_DISABLED='SDL_IOS_IDLE_TIMER_DISABLED';
+  SDL_HINT_ORIENTATIONS='SDL_IOS_ORIENTATIONS';
+  SDL_HINT_ACCELEROMETER_AS_JOYSTICK='SDL_ACCELEROMETER_AS_JOYSTICK';
+  SDL_HINT_XINPUT_ENABLED='SDL_XINPUT_ENABLED';
+  SDL_HINT_GAMECONTROLLERCONFIG='SDL_GAMECONTROLLERCONFIG';
+  SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS='SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS';
+  SDL_HINT_ALLOW_TOPMOST='SDL_ALLOW_TOPMOST';
+  SDL_HINT_TIMER_RESOLUTION='SDL_TIMER_RESOLUTION';
+  SDL_HINT_VIDEO_HIGHDPI_DISABLED='SDL_VIDEO_HIGHDPI_DISABLED';
+  SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK='SDL_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK';
+  SDL_HINT_VIDEO_WIN_D3DCOMPILER='SDL_VIDEO_WIN_D3DCOMPILER';
+  SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT='SDL_VIDEO_WINDOW_SHARE_PIXEL_FORMAT';
+  SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES='SDL_VIDEO_MAC_FULLSCREEN_SPACES';
 
 type
   TSDL_HintPriority = (
@@ -365,11 +358,12 @@ function SDL_GetPlatform: pchar; lSDL;
 //=====SDL_POWER=====
 
 type
-  TSDL_PowerState=(SDL_POWERSTATE_UNKNOWN,
-                   SDL_POWERSTATE_ON_BATTERY,
-                   SDL_POWERSTATE_NO_BATTERY,
-                   SDL_POWERSTATE_CHARGING,
-                   SDL_POWERSTATE_CHARGED);
+  TSDL_PowerState=(
+    SDL_POWERSTATE_UNKNOWN,
+    SDL_POWERSTATE_ON_BATTERY,
+    SDL_POWERSTATE_NO_BATTERY,
+    SDL_POWERSTATE_CHARGING,
+    SDL_POWERSTATE_CHARGED);
 
 function SDL_GetPowerInfo(secs: plongint; pct: plongint): TSDL_PowerState; lSDL;
 
@@ -476,52 +470,6 @@ type
   {$DEFINE REC_2:=1}
   {$DEFINE REC_3:=2}
 
-  Thidden = record
-    case Uint32 of
-      {$IFDEF ANDROID}
-        {$DEFINE REC_1:=1}
-        {$DEFINE REC_2:=2}
-        {$DEFINE REC_3:=3}
-      0: (androidio: record
-            fileNameRef,
-            inputStreamRef,
-            readableByteChannelRef,
-            readMethod,
-            assetFileDescriptorRef: pointer;
-            position,
-            size,
-            offset,
-            fd: longint;
-          end;);
-      {$ENDIF}
-      {$IFDEF WINDOWS}
-      0: (windowsio: record
-            append: SDL_bool;
-            h: pointer;
-            buffer: record
-              data: pointer;
-              size,
-              left: longword;
-            end;
-          end;);
-      {$ENDIF}
-      {$IFDEF HAVE_STDIO_H} //stdio not available on Windows
-      REC_1: (stdio: record
-            autoclose: SDL_bool;
-            fp: pointer;
-          end;);
-      {$ENDIF}
-      REC_2: (mem: record
-            base,
-            here,
-            stop: PUint8;
-          end;);
-      REC_3: (unknown: record
-            data1,
-            data2: pointer;
-          end;);
-  end;
-
   PSDL_RWops = ^TSDL_RWops;
   TSDL_RWops = record
     size: function(context: PSDL_RWops): Sint64; cdecl;
@@ -531,14 +479,58 @@ type
     read: function(context: PSDL_RWops;
                    ptr: pointer;
                    size,
-                   maxnum: longword): longword; cdecl;
+                   maxnum: size_t): size_t; cdecl;
     write: function(context: PSDL_RWops;
                     const ptr: pointer;
                     size,
-                    num: longword): longword; cdecl;
+                    num: size_t): size_t; cdecl;
     close: function(context: PSDL_RWops): longint; cdecl;
     type_: Uint32;
-    hidden: Thidden;
+    hidden: record
+      case Uint32 of
+        {$IFDEF ANDROID}
+          {$DEFINE REC_1:=1}
+          {$DEFINE REC_2:=2}
+          {$DEFINE REC_3:=3}
+        0: (androidio: record
+              fileNameRef,
+              inputStreamRef,
+              readableByteChannelRef,
+              readMethod,
+              assetFileDescriptorRef: pointer;
+              position,
+              size,
+              offset,
+              fd: longint;
+            end;);
+        {$ENDIF}
+        {$IFDEF WINDOWS}
+        0: (windowsio: record
+              append: SDL_bool;
+              h: pointer;
+              buffer: record
+                data: pointer;
+                size,
+                left: size_t;
+              end;
+            end;);
+        {$ENDIF}
+        {$IFDEF HAVE_STDIO_H} //stdio not available on Windows
+        REC_1: (stdio: record
+              autoclose: SDL_bool;
+              fp: pointer;
+            end;);
+        {$ENDIF}
+        REC_2: (mem: record
+              base,
+              here,
+              stop: PUint8;
+            end;);
+        REC_3: (unknown: record
+              data1,
+              data2: pointer;
+            end;);
+    end;
   end;
 
 function SDL_RWFromFile(const _file: pchar;
@@ -568,13 +560,13 @@ function SDL_ReadBE32(src: PSDL_RWops): Uint32; lSDL;
 function SDL_ReadLE64(src: PSDL_RWops): Uint64; lSDL;
 function SDL_ReadBE64(src: PSDL_RWops): Uint64; lSDL;
 
-function SDL_WriteU8(dst: PSDL_RWops; value: Uint8): longword; lSDL;
-function SDL_WriteLE16(dst: PSDL_RWops; value: Uint16): longword; lSDL;
-function SDL_WriteBE16(dst: PSDL_RWops; value: Uint16): longword; lSDL;
-function SDL_WriteLE32(dst: PSDL_RWops; value: Uint32): longword; lSDL;
-function SDL_WriteBE32(dst: PSDL_RWops; value: Uint32): longword; lSDL;
-function SDL_WriteLE64(dst: PSDL_RWops; value: Uint64): longword; lSDL;
-function SDL_WriteBE64(dst: PSDL_RWops; value: Uint64): longword; lSDL;
+function SDL_WriteU8(dst: PSDL_RWops; value: Uint8): size_t; lSDL;
+function SDL_WriteLE16(dst: PSDL_RWops; value: Uint16): size_t; lSDL;
+function SDL_WriteBE16(dst: PSDL_RWops; value: Uint16): size_t; lSDL;
+function SDL_WriteLE32(dst: PSDL_RWops; value: Uint32): size_t; lSDL;
+function SDL_WriteBE32(dst: PSDL_RWops; value: Uint32): size_t; lSDL;
+function SDL_WriteLE64(dst: PSDL_RWops; value: Uint64): size_t; lSDL;
+function SDL_WriteBE64(dst: PSDL_RWops; value: Uint64): size_t; lSDL;
 
 //=====SDL_AUDIO=====
 
@@ -844,17 +836,10 @@ type
   end;
 
 function SDL_GetPixelFormatName(format: Uint32): pchar; lSDL;
-function SDL_PixelFormatEnumToMasks(format: Uint32;
-                                    bpp: plongint;
-                                    Rmask,
-                                    Gmask,
-                                    Bmask,
-                                    Amask: PUint32): SDL_bool; lSDL;
+function SDL_PixelFormatEnumToMasks(format: Uint32; bpp: plongint;
+                           Rmask, Gmask, Bmask, Amask: PUint32): SDL_bool; lSDL;
 function SDL_MasksToPixelFormatEnum(bpp: longint;
-                                    Rmask,
-                                    Gmask,
-                                    Bmask,
-                                    Amask: Uint32): Uint32; lSDL;
+                           Rmask, Gmask, Bmask, Amask: Uint32): Uint32; lSDL;
 function SDL_AllocFormat(pixel_format: Uint32): PSDL_PixelFormat; lSDL;
 procedure SDL_FreeFormat(format: PSDL_PixelFormat); lSDL;
 function SDL_AllocPalette(ncolors: longint): PSDL_Palette; lSDL;
@@ -987,14 +972,9 @@ function SDL_ConvertSurface(src: PSDL_Surface; fmt: PSDL_PixelFormat;
                             flags: Uint32): PSDL_Surface; lSDL;
 function SDL_ConvertSurfaceFormat(src: PSDL_Surface; pixel_format: Uint32;
                                   flags: Uint32): PSDL_Surface; lSDL;
-function SDL_ConvertPixels(width,
-                           height: longint;
-                           src_format: Uint32;
-                           const src: pointer;
-                           src_pitch: longint;
-                           dst_format: Uint32;
-                           dst: pointer;
-                           dst_pitch: longint): longint; lSDL;
+function SDL_ConvertPixels(width, height: longint;
+           src_format: Uint32; const src: pointer; src_pitch: longint;
+           dst_format: Uint32; dst: pointer; dst_pitch: longint): longint; lSDL;
 function SDL_FillRect(dst: PSDL_Surface; const rect: PSDL_Rect;
                       color: Uint32): longint; lSDL;
 function SDL_FillRects(dst: PSDL_Surface; const rects: PSDL_Rect;
@@ -1006,21 +986,15 @@ function SDL_UpperBlit(src: PSDL_Surface; const srcrect: PSDL_Rect;
                        dst: PSDL_Surface; dstrect: PSDL_Rect): longint; lSDL;
 function SDL_LowerBlit(src: PSDL_Surface; srcrect: PSDL_Rect; dst: PSDL_Surface;
                        dstrect: PSDL_Rect): longint; lSDL;
-function SDL_SoftStretch(src: PSDL_Surface;
-                         const srcrect: PSDL_Rect;
-                         dst: PSDL_Surface;
-                         const dstrect: PSDL_Surface): longint; lSDL;
+function SDL_SoftStretch(src: PSDL_Surface; const srcrect: PSDL_Rect;
+                 dst: PSDL_Surface; const dstrect: PSDL_Surface): longint; lSDL;
 function SDL_BlitScaled(src: PSDL_Surface; const srcrect: PSDL_Rect;
                         dst: PSDL_Surface; dstrect: PSDL_Rect): longint; cdecl;
                           external name 'SDL_UpperBlitScaled';
-function SDL_UpperBlitScaled(src: PSDL_Surface;
-                             const srcrect: PSDL_Rect;
-                             dst: PSDL_Surface;
-                             dstrect: PSDL_Rect): longint; lSDL;
-function SDL_LowerBlitScaled(src: PSDL_Surface;
-                             srcrect: PSDL_Rect;
-                             dst: PSDL_Surface;
-                             dstrect: PSDL_Rect): longint; lSDL;
+function SDL_UpperBlitScaled(src: PSDL_Surface; const srcrect: PSDL_Rect;
+                          dst: PSDL_Surface; dstrect: PSDL_Rect): longint; lSDL;
+function SDL_LowerBlitScaled(src: PSDL_Surface; srcrect: PSDL_Rect;
+                          dst: PSDL_Surface; dstrect: PSDL_Rect): longint; lSDL;
 
 //=====SDL_VIDEO=====
 
@@ -1220,7 +1194,7 @@ const
 
 type
   TSDL_WindowShapeParams = record
-    case integer of
+    case longint of
       0: (binarizationCutoff: Uint8;);
       1: (colorKey: TSDL_Color;);
   end;
@@ -1453,145 +1427,267 @@ type
   TSDL_ScanCode = longword;
 
 const
-  SDL_SCANCODE_UNKNOWN         = 0;     SDL_SCANCODE_INTERNATIONAL1     = 135;
-                                        SDL_SCANCODE_INTERNATIONAL2     = 136;
-  SDL_SCANCODE_A               = 4;     SDL_SCANCODE_INTERNATIONAL3     = 137;
-  SDL_SCANCODE_B               = 5;     SDL_SCANCODE_INTERNATIONAL4     = 138;
-  SDL_SCANCODE_C               = 6;     SDL_SCANCODE_INTERNATIONAL5     = 139;
-  SDL_SCANCODE_D               = 7;     SDL_SCANCODE_INTERNATIONAL6     = 140;
-  SDL_SCANCODE_E               = 8;     SDL_SCANCODE_INTERNATIONAL7     = 141;
-  SDL_SCANCODE_F               = 9;     SDL_SCANCODE_INTERNATIONAL8     = 142;
-  SDL_SCANCODE_G               = 10;    SDL_SCANCODE_INTERNATIONAL9     = 143;
-  SDL_SCANCODE_H               = 11;    SDL_SCANCODE_LANG1              = 144;
-  SDL_SCANCODE_I               = 12;    SDL_SCANCODE_LANG2              = 145;
-  SDL_SCANCODE_J               = 13;    SDL_SCANCODE_LANG3              = 146;
-  SDL_SCANCODE_K               = 14;    SDL_SCANCODE_LANG4              = 147;
-  SDL_SCANCODE_L               = 15;    SDL_SCANCODE_LANG5              = 148;
-  SDL_SCANCODE_M               = 16;    SDL_SCANCODE_LANG6              = 149;
-  SDL_SCANCODE_N               = 17;    SDL_SCANCODE_LANG7              = 150;
-  SDL_SCANCODE_O               = 18;    SDL_SCANCODE_LANG8              = 151;
-  SDL_SCANCODE_P               = 19;    SDL_SCANCODE_LANG9              = 152;
-  SDL_SCANCODE_Q               = 20;
-  SDL_SCANCODE_R               = 21;    SDL_SCANCODE_ALTERASE           = 153;
-  SDL_SCANCODE_S               = 22;    SDL_SCANCODE_SYSREQ             = 154;
-  SDL_SCANCODE_T               = 23;    SDL_SCANCODE_CANCEL             = 155;
-  SDL_SCANCODE_U               = 24;    SDL_SCANCODE_CLEAR              = 156;
-  SDL_SCANCODE_V               = 25;    SDL_SCANCODE_PRIOR              = 157;
-  SDL_SCANCODE_W               = 26;    SDL_SCANCODE_RETURN2            = 158;
-  SDL_SCANCODE_X               = 27;    SDL_SCANCODE_SEPARATOR          = 159;
-  SDL_SCANCODE_Y               = 28;    SDL_SCANCODE_OUT                = 160;
-  SDL_SCANCODE_Z               = 29;    SDL_SCANCODE_OPER               = 161;
-                                        SDL_SCANCODE_CLEARAGAIN         = 162;
-  SDL_SCANCODE_1               = 30;    SDL_SCANCODE_CRSEL              = 163;
-  SDL_SCANCODE_2               = 31;    SDL_SCANCODE_EXSEL              = 164;
-  SDL_SCANCODE_3               = 32;
-  SDL_SCANCODE_4               = 33;    SDL_SCANCODE_KP_00              = 176;
-  SDL_SCANCODE_5               = 34;    SDL_SCANCODE_KP_000             = 177;
-  SDL_SCANCODE_6               = 35;    SDL_SCANCODE_THOUSANDSSEPARATOR = 178;
-  SDL_SCANCODE_7               = 36;    SDL_SCANCODE_DECIMALSEPARATOR   = 179;
-  SDL_SCANCODE_8               = 37;    SDL_SCANCODE_CURRENCYUNIT       = 180;
-  SDL_SCANCODE_9               = 38;    SDL_SCANCODE_CURRENCYSUBUNIT    = 181;
-  SDL_SCANCODE_0               = 39;    SDL_SCANCODE_KP_LEFTPAREN       = 182;
-                                        SDL_SCANCODE_KP_RIGHTPAREN      = 183;
-  SDL_SCANCODE_RETURN          = 40;    SDL_SCANCODE_KP_LEFTBRACE       = 184;
-  SDL_SCANCODE_ESCAPE          = 41;    SDL_SCANCODE_KP_RIGHTBRACE      = 185;
-  SDL_SCANCODE_BACKSPACE       = 42;    SDL_SCANCODE_KP_TAB             = 186;
-  SDL_SCANCODE_TAB             = 43;    SDL_SCANCODE_KP_BACKSPACE       = 187;
-  SDL_SCANCODE_SPACE           = 44;    SDL_SCANCODE_KP_A               = 188;
-                                        SDL_SCANCODE_KP_B               = 189;
-  SDL_SCANCODE_MINUS           = 45;    SDL_SCANCODE_KP_C               = 190;
-  SDL_SCANCODE_EQUALS          = 46;    SDL_SCANCODE_KP_D               = 191;
-  SDL_SCANCODE_LEFTBRACKET     = 47;    SDL_SCANCODE_KP_E               = 192;
-  SDL_SCANCODE_RIGHTBRACKET    = 48;    SDL_SCANCODE_KP_F               = 193;
-  SDL_SCANCODE_BACKSLASH       = 49;    SDL_SCANCODE_KP_XOR             = 194;
-  SDL_SCANCODE_NONUSHASH       = 50;    SDL_SCANCODE_KP_POWER           = 195;
-  SDL_SCANCODE_SEMICOLON       = 51;    SDL_SCANCODE_KP_PERCENT         = 196;
-  SDL_SCANCODE_APOSTROPHE      = 52;    SDL_SCANCODE_KP_LESS            = 197;
-  SDL_SCANCODE_GRAVE           = 53;    SDL_SCANCODE_KP_GREATER         = 198;
-  SDL_SCANCODE_COMMA           = 54;    SDL_SCANCODE_KP_AMPERSAND       = 199;
-  SDL_SCANCODE_PERIOD          = 55;    SDL_SCANCODE_KP_DBLAMPERSAND    = 200;
-  SDL_SCANCODE_SLASH           = 56;    SDL_SCANCODE_KP_VERTICALBAR     = 201;
-                                        SDL_SCANCODE_KP_DBLVERTICALBAR  = 202;
-  SDL_SCANCODE_CAPSLOCK        = 57;    SDL_SCANCODE_KP_COLON           = 203;
-                                        SDL_SCANCODE_KP_HASH            = 204;
-  SDL_SCANCODE_F1              = 58;    SDL_SCANCODE_KP_SPACE           = 205;
-  SDL_SCANCODE_F2              = 59;    SDL_SCANCODE_KP_AT              = 206;
-  SDL_SCANCODE_F3              = 60;    SDL_SCANCODE_KP_EXCLAM          = 207;
-  SDL_SCANCODE_F4              = 61;    SDL_SCANCODE_KP_MEMSTORE        = 208;
-  SDL_SCANCODE_F5              = 62;    SDL_SCANCODE_KP_MEMRECALL       = 209;
-  SDL_SCANCODE_F6              = 63;    SDL_SCANCODE_KP_MEMCLEAR        = 210;
-  SDL_SCANCODE_F7              = 64;    SDL_SCANCODE_KP_MEMADD          = 211;
-  SDL_SCANCODE_F8              = 65;    SDL_SCANCODE_KP_MEMSUBTRACT     = 212;
-  SDL_SCANCODE_F9              = 66;    SDL_SCANCODE_KP_MEMMULTIPLY     = 213;
-  SDL_SCANCODE_F10             = 67;    SDL_SCANCODE_KP_MEMDIVIDE       = 214;
-  SDL_SCANCODE_F11             = 68;    SDL_SCANCODE_KP_PLUSMINUS       = 215;
-  SDL_SCANCODE_F12             = 69;    SDL_SCANCODE_KP_CLEAR           = 216;
-                                        SDL_SCANCODE_KP_CLEARENTRY      = 217;
-  SDL_SCANCODE_PRINTSCREEN     = 70;    SDL_SCANCODE_KP_BINARY          = 218;
-  SDL_SCANCODE_SCROLLLOCK      = 71;    SDL_SCANCODE_KP_OCTAL           = 219;
-  SDL_SCANCODE_PAUSE           = 72;    SDL_SCANCODE_KP_DECIMAL         = 220;
-  SDL_SCANCODE_INSERT          = 73;    SDL_SCANCODE_KP_HEXADECIMAL     = 221;
-  SDL_SCANCODE_HOME            = 74;
-  SDL_SCANCODE_PAGEUP          = 75;    SDL_SCANCODE_LCTRL              = 224;
-  SDL_SCANCODE_DELETE          = 76;    SDL_SCANCODE_LSHIFT             = 225;
-  SDL_SCANCODE_END             = 77;    SDL_SCANCODE_LALT               = 226;
-  SDL_SCANCODE_PAGEDOWN        = 78;    SDL_SCANCODE_LGUI               = 227;
-  SDL_SCANCODE_RIGHT           = 79;    SDL_SCANCODE_RCTRL              = 228;
-  SDL_SCANCODE_LEFT            = 80;    SDL_SCANCODE_RSHIFT             = 229;
-  SDL_SCANCODE_DOWN            = 81;    SDL_SCANCODE_RALT               = 230;
-  SDL_SCANCODE_UP              = 82;    SDL_SCANCODE_RGUI               = 231;
+  SDL_SCANCODE_UNKNOWN = 0;
 
-  SDL_SCANCODE_NUMLOCKCLEAR    = 83;    SDL_SCANCODE_MODE               = 257;
-  SDL_SCANCODE_KP_DIVIDE       = 84;
-  SDL_SCANCODE_KP_MULTIPLY     = 85;    SDL_SCANCODE_AUDIONEXT          = 258;
-  SDL_SCANCODE_KP_MINUS        = 86;    SDL_SCANCODE_AUDIOPREV          = 259;
-  SDL_SCANCODE_KP_PLUS         = 87;    SDL_SCANCODE_AUDIOSTOP          = 260;
-  SDL_SCANCODE_KP_ENTER        = 88;    SDL_SCANCODE_AUDIOPLAY          = 261;
-  SDL_SCANCODE_KP_1            = 89;    SDL_SCANCODE_AUDIOMUTE          = 262;
-  SDL_SCANCODE_KP_2            = 90;    SDL_SCANCODE_MEDIASELECT        = 263;
-  SDL_SCANCODE_KP_3            = 91;    SDL_SCANCODE_WWW                = 264;
-  SDL_SCANCODE_KP_4            = 92;    SDL_SCANCODE_MAIL               = 265;
-  SDL_SCANCODE_KP_5            = 93;    SDL_SCANCODE_CALCULATOR         = 266;
-  SDL_SCANCODE_KP_6            = 94;    SDL_SCANCODE_COMPUTER           = 267;
-  SDL_SCANCODE_KP_7            = 95;    SDL_SCANCODE_AC_SEARCH          = 268;
-  SDL_SCANCODE_KP_8            = 96;    SDL_SCANCODE_AC_HOME            = 269;
-  SDL_SCANCODE_KP_9            = 97;    SDL_SCANCODE_AC_BACK            = 270;
-  SDL_SCANCODE_KP_0            = 98;    SDL_SCANCODE_AC_FORWARD         = 271;
-  SDL_SCANCODE_KP_PERIOD       = 99;    SDL_SCANCODE_AC_STOP            = 272;
-                                        SDL_SCANCODE_AC_REFRESH         = 273;
-  SDL_SCANCODE_NONUSBACKSLASH = 100;    SDL_SCANCODE_AC_BOOKMARKS       = 274;
-  SDL_SCANCODE_APPLICATION    = 101;
-  SDL_SCANCODE_POWER          = 102;    SDL_SCANCODE_BRIGHTNESSDOWN     = 275;
-  SDL_SCANCODE_KP_EQUALS      = 103;    SDL_SCANCODE_BRIGHTNESSUP       = 276;
-                                        SDL_SCANCODE_DISPLAYSWITCH      = 277;
-  SDL_SCANCODE_F13            = 104;    SDL_SCANCODE_KBDILLUMTOGGLE     = 278;
-  SDL_SCANCODE_F14            = 105;    SDL_SCANCODE_KBDILLUMDOWN       = 279;
-  SDL_SCANCODE_F15            = 106;    SDL_SCANCODE_KBDILLUMUP         = 280;
-  SDL_SCANCODE_F16            = 107;    SDL_SCANCODE_EJECT              = 281;
-  SDL_SCANCODE_F17            = 108;    SDL_SCANCODE_SLEEP              = 282;
-  SDL_SCANCODE_F18            = 109;
-  SDL_SCANCODE_F19            = 110;    SDL_SCANCODE_APP1               = 283;
-  SDL_SCANCODE_F20            = 111;    SDL_SCANCODE_APP2               = 284;
-  SDL_SCANCODE_F21            = 112;
-  SDL_SCANCODE_F22            = 113;    SDL_NUM_SCANCODES               = 512;
-  SDL_SCANCODE_F23            = 114;
-  SDL_SCANCODE_F24            = 115;
-  SDL_SCANCODE_EXECUTE        = 116;
-  SDL_SCANCODE_HELP           = 117;
-  SDL_SCANCODE_MENU           = 118;
-  SDL_SCANCODE_SELECT         = 119;
-  SDL_SCANCODE_STOP           = 120;
-  SDL_SCANCODE_AGAIN          = 121;
-  SDL_SCANCODE_UNDO           = 122;
-  SDL_SCANCODE_CUT            = 123;
-  SDL_SCANCODE_COPY           = 124;
-  SDL_SCANCODE_PASTE          = 125;
-  SDL_SCANCODE_FIND           = 126;
-  SDL_SCANCODE_MUTE           = 127;
-  SDL_SCANCODE_VOLUMEUP       = 128;
-  SDL_SCANCODE_VOLUMEDOWN     = 129;
-  SDL_SCANCODE_KP_COMMA       = 133;
+  SDL_SCANCODE_A = 4;
+  SDL_SCANCODE_B = 5;
+  SDL_SCANCODE_C = 6;
+  SDL_SCANCODE_D = 7;
+  SDL_SCANCODE_E = 8;
+  SDL_SCANCODE_F = 9;
+  SDL_SCANCODE_G = 10;
+  SDL_SCANCODE_H = 11;
+  SDL_SCANCODE_I = 12;
+  SDL_SCANCODE_J = 13;
+  SDL_SCANCODE_K = 14;
+  SDL_SCANCODE_L = 15;
+  SDL_SCANCODE_M = 16;
+  SDL_SCANCODE_N = 17;
+  SDL_SCANCODE_O = 18;
+  SDL_SCANCODE_P = 19;
+  SDL_SCANCODE_Q = 20;
+  SDL_SCANCODE_R = 21;
+  SDL_SCANCODE_S = 22;
+  SDL_SCANCODE_T = 23;
+  SDL_SCANCODE_U = 24;
+  SDL_SCANCODE_V = 25;
+  SDL_SCANCODE_W = 26;
+  SDL_SCANCODE_X = 27;
+  SDL_SCANCODE_Y = 28;
+  SDL_SCANCODE_Z = 29;
+
+  SDL_SCANCODE_1 = 30;
+  SDL_SCANCODE_2 = 31;
+  SDL_SCANCODE_3 = 32;
+  SDL_SCANCODE_4 = 33;
+  SDL_SCANCODE_5 = 34;
+  SDL_SCANCODE_6 = 35;
+  SDL_SCANCODE_7 = 36;
+  SDL_SCANCODE_8 = 37;
+  SDL_SCANCODE_9 = 38;
+  SDL_SCANCODE_0 = 39;
+
+  SDL_SCANCODE_RETURN = 40;
+  SDL_SCANCODE_ESCAPE = 41;
+  SDL_SCANCODE_BACKSPACE = 42;
+  SDL_SCANCODE_TAB = 43;
+  SDL_SCANCODE_SPACE = 44;
+
+  SDL_SCANCODE_MINUS = 45;
+  SDL_SCANCODE_EQUALS = 46;
+  SDL_SCANCODE_LEFTBRACKET = 47;
+  SDL_SCANCODE_RIGHTBRACKET = 48;
+  SDL_SCANCODE_BACKSLASH = 49;
+  SDL_SCANCODE_NONUSHASH = 50;
+  SDL_SCANCODE_SEMICOLON = 51;
+  SDL_SCANCODE_APOSTROPHE = 52;
+  SDL_SCANCODE_GRAVE = 53;
+  SDL_SCANCODE_COMMA = 54;
+  SDL_SCANCODE_PERIOD = 55;
+  SDL_SCANCODE_SLASH = 56;
+
+  SDL_SCANCODE_CAPSLOCK = 57;
+
+  SDL_SCANCODE_F1 = 58;
+  SDL_SCANCODE_F2 = 59;
+  SDL_SCANCODE_F3 = 60;
+  SDL_SCANCODE_F4 = 61;
+  SDL_SCANCODE_F5 = 62;
+  SDL_SCANCODE_F6 = 63;
+  SDL_SCANCODE_F7 = 64;
+  SDL_SCANCODE_F8 = 65;
+  SDL_SCANCODE_F9 = 66;
+  SDL_SCANCODE_F10 = 67;
+  SDL_SCANCODE_F11 = 68;
+  SDL_SCANCODE_F12 = 69;
+
+  SDL_SCANCODE_PRINTSCREEN = 70;
+  SDL_SCANCODE_SCROLLLOCK = 71;
+  SDL_SCANCODE_PAUSE = 72;
+  SDL_SCANCODE_INSERT = 73;
+  SDL_SCANCODE_HOME = 74;
+  SDL_SCANCODE_PAGEUP = 75;
+  SDL_SCANCODE_DELETE = 76;
+  SDL_SCANCODE_END = 77;
+  SDL_SCANCODE_PAGEDOWN = 78;
+  SDL_SCANCODE_RIGHT = 79;
+  SDL_SCANCODE_LEFT = 80;
+  SDL_SCANCODE_DOWN = 81;
+  SDL_SCANCODE_UP = 82;
+
+  SDL_SCANCODE_NUMLOCKCLEAR = 83;
+  SDL_SCANCODE_KP_DIVIDE = 84;
+  SDL_SCANCODE_KP_MULTIPLY = 85;
+  SDL_SCANCODE_KP_MINUS = 86;
+  SDL_SCANCODE_KP_PLUS = 87;
+  SDL_SCANCODE_KP_ENTER = 88;
+  SDL_SCANCODE_KP_1 = 89;
+  SDL_SCANCODE_KP_2 = 90;
+  SDL_SCANCODE_KP_3 = 91;
+  SDL_SCANCODE_KP_4 = 92;
+  SDL_SCANCODE_KP_5 = 93;
+  SDL_SCANCODE_KP_6 = 94;
+  SDL_SCANCODE_KP_7 = 95;
+  SDL_SCANCODE_KP_8 = 96;
+  SDL_SCANCODE_KP_9 = 97;
+  SDL_SCANCODE_KP_0 = 98;
+  SDL_SCANCODE_KP_PERIOD = 99;
+
+  SDL_SCANCODE_NONUSBACKSLASH = 100;
+  SDL_SCANCODE_APPLICATION = 101;
+  SDL_SCANCODE_POWER = 102;
+  SDL_SCANCODE_KP_EQUALS = 103;
+
+  SDL_SCANCODE_F13 = 104;
+  SDL_SCANCODE_F14 = 105;
+  SDL_SCANCODE_F15 = 106;
+  SDL_SCANCODE_F16 = 107;
+  SDL_SCANCODE_F17 = 108;
+  SDL_SCANCODE_F18 = 109;
+  SDL_SCANCODE_F19 = 110;
+  SDL_SCANCODE_F20 = 111;
+  SDL_SCANCODE_F21 = 112;
+  SDL_SCANCODE_F22 = 113;
+  SDL_SCANCODE_F23 = 114;
+  SDL_SCANCODE_F24 = 115;
+  SDL_SCANCODE_EXECUTE = 116;
+  SDL_SCANCODE_HELP = 117;
+  SDL_SCANCODE_MENU = 118;
+  SDL_SCANCODE_SELECT = 119;
+  SDL_SCANCODE_STOP = 120;
+  SDL_SCANCODE_AGAIN = 121;
+  SDL_SCANCODE_UNDO = 122;
+  SDL_SCANCODE_CUT = 123;
+  SDL_SCANCODE_COPY = 124;
+  SDL_SCANCODE_PASTE = 125;
+  SDL_SCANCODE_FIND = 126;
+  SDL_SCANCODE_MUTE = 127;
+  SDL_SCANCODE_VOLUMEUP = 128;
+  SDL_SCANCODE_VOLUMEDOWN = 129;
+  SDL_SCANCODE_KP_COMMA = 133;
   SDL_SCANCODE_KP_EQUALSAS400 = 134;
+
+  SDL_SCANCODE_INTERNATIONAL1 = 135;
+  SDL_SCANCODE_INTERNATIONAL2 = 136;
+  SDL_SCANCODE_INTERNATIONAL3 = 137;
+  SDL_SCANCODE_INTERNATIONAL4 = 138;
+  SDL_SCANCODE_INTERNATIONAL5 = 139;
+  SDL_SCANCODE_INTERNATIONAL6 = 140;
+  SDL_SCANCODE_INTERNATIONAL7 = 141;
+  SDL_SCANCODE_INTERNATIONAL8 = 142;
+  SDL_SCANCODE_INTERNATIONAL9 = 143;
+  SDL_SCANCODE_LANG1 = 144;
+  SDL_SCANCODE_LANG2 = 145;
+  SDL_SCANCODE_LANG3 = 146;
+  SDL_SCANCODE_LANG4 = 147;
+  SDL_SCANCODE_LANG5 = 148;
+  SDL_SCANCODE_LANG6 = 149;
+  SDL_SCANCODE_LANG7 = 150;
+  SDL_SCANCODE_LANG8 = 151;
+  SDL_SCANCODE_LANG9 = 152;
+
+  SDL_SCANCODE_ALTERASE = 153;
+  SDL_SCANCODE_SYSREQ = 154;
+  SDL_SCANCODE_CANCEL = 155;
+  SDL_SCANCODE_CLEAR = 156;
+  SDL_SCANCODE_PRIOR = 157;
+  SDL_SCANCODE_RETURN2 = 158;
+  SDL_SCANCODE_SEPARATOR = 159;
+  SDL_SCANCODE_OUT = 160;
+  SDL_SCANCODE_OPER = 161;
+  SDL_SCANCODE_CLEARAGAIN = 162;
+  SDL_SCANCODE_CRSEL = 163;
+  SDL_SCANCODE_EXSEL = 164;
+
+  SDL_SCANCODE_KP_00 = 176;
+  SDL_SCANCODE_KP_000 = 177;
+  SDL_SCANCODE_THOUSANDSSEPARATOR = 178;
+  SDL_SCANCODE_DECIMALSEPARATOR = 179;
+  SDL_SCANCODE_CURRENCYUNIT = 180;
+  SDL_SCANCODE_CURRENCYSUBUNIT = 181;
+  SDL_SCANCODE_KP_LEFTPAREN = 182;
+  SDL_SCANCODE_KP_RIGHTPAREN = 183;
+  SDL_SCANCODE_KP_LEFTBRACE = 184;
+  SDL_SCANCODE_KP_RIGHTBRACE = 185;
+  SDL_SCANCODE_KP_TAB = 186;
+  SDL_SCANCODE_KP_BACKSPACE = 187;
+  SDL_SCANCODE_KP_A = 188;
+  SDL_SCANCODE_KP_B = 189;
+  SDL_SCANCODE_KP_C = 190;
+  SDL_SCANCODE_KP_D = 191;
+  SDL_SCANCODE_KP_E = 192;
+  SDL_SCANCODE_KP_F = 193;
+  SDL_SCANCODE_KP_XOR = 194;
+  SDL_SCANCODE_KP_POWER = 195;
+  SDL_SCANCODE_KP_PERCENT = 196;
+  SDL_SCANCODE_KP_LESS = 197;
+  SDL_SCANCODE_KP_GREATER = 198;
+  SDL_SCANCODE_KP_AMPERSAND = 199;
+  SDL_SCANCODE_KP_DBLAMPERSAND = 200;
+  SDL_SCANCODE_KP_VERTICALBAR = 201;
+  SDL_SCANCODE_KP_DBLVERTICALBAR = 202;
+  SDL_SCANCODE_KP_COLON = 203;
+  SDL_SCANCODE_KP_HASH = 204;
+  SDL_SCANCODE_KP_SPACE = 205;
+  SDL_SCANCODE_KP_AT = 206;
+  SDL_SCANCODE_KP_EXCLAM = 207;
+  SDL_SCANCODE_KP_MEMSTORE = 208;
+  SDL_SCANCODE_KP_MEMRECALL = 209;
+  SDL_SCANCODE_KP_MEMCLEAR = 210;
+  SDL_SCANCODE_KP_MEMADD = 211;
+  SDL_SCANCODE_KP_MEMSUBTRACT = 212;
+  SDL_SCANCODE_KP_MEMMULTIPLY = 213;
+  SDL_SCANCODE_KP_MEMDIVIDE = 214;
+  SDL_SCANCODE_KP_PLUSMINUS = 215;
+  SDL_SCANCODE_KP_CLEAR = 216;
+  SDL_SCANCODE_KP_CLEARENTRY = 217;
+  SDL_SCANCODE_KP_BINARY = 218;
+  SDL_SCANCODE_KP_OCTAL = 219;
+  SDL_SCANCODE_KP_DECIMAL = 220;
+  SDL_SCANCODE_KP_HEXADECIMAL = 221;
+
+  SDL_SCANCODE_LCTRL = 224;
+  SDL_SCANCODE_LSHIFT = 225;
+  SDL_SCANCODE_LALT = 226;
+  SDL_SCANCODE_LGUI = 227;
+  SDL_SCANCODE_RCTRL = 228;
+  SDL_SCANCODE_RSHIFT = 229;
+  SDL_SCANCODE_RALT = 230;
+  SDL_SCANCODE_RGUI = 231;
+
+  SDL_SCANCODE_MODE = 257;
+
+  SDL_SCANCODE_AUDIONEXT = 258;
+  SDL_SCANCODE_AUDIOPREV = 259;
+  SDL_SCANCODE_AUDIOSTOP = 260;
+  SDL_SCANCODE_AUDIOPLAY = 261;
+  SDL_SCANCODE_AUDIOMUTE = 262;
+  SDL_SCANCODE_MEDIASELECT = 263;
+  SDL_SCANCODE_WWW = 264;
+  SDL_SCANCODE_MAIL = 265;
+  SDL_SCANCODE_CALCULATOR = 266;
+  SDL_SCANCODE_COMPUTER = 267;
+  SDL_SCANCODE_AC_SEARCH = 268;
+  SDL_SCANCODE_AC_HOME = 269;
+  SDL_SCANCODE_AC_BACK = 270;
+  SDL_SCANCODE_AC_FORWARD = 271;
+  SDL_SCANCODE_AC_STOP = 272;
+  SDL_SCANCODE_AC_REFRESH = 273;
+  SDL_SCANCODE_AC_BOOKMARKS = 274;
+
+  SDL_SCANCODE_BRIGHTNESSDOWN = 275;
+  SDL_SCANCODE_BRIGHTNESSUP = 276;
+  SDL_SCANCODE_DISPLAYSWITCH = 277;
+  SDL_SCANCODE_KBDILLUMTOGGLE = 278;
+  SDL_SCANCODE_KBDILLUMDOWN = 279;
+  SDL_SCANCODE_KBDILLUMUP = 280;
+  SDL_SCANCODE_EJECT = 281;
+  SDL_SCANCODE_SLEEP = 282;
+
+  SDL_SCANCODE_APP1 = 283;
+  SDL_SCANCODE_APP2 = 284;
+
+  SDL_NUM_SCANCODES = 512;
 
 //=====SDL_KEYCODE=====
 
@@ -1601,41 +1697,76 @@ const
 const
   SDLK_UNKNOWN = 0;
 
-  SDLK_RETURN = $D;             SDLK_QUESTION = Ord('?');
-  SDLK_ESCAPE = $1B;            SDLK_AT = Ord('@');
-  SDLK_BACKSPACE = $8;          SDLK_LEFTBRACKET = Ord('[');
-  SDLK_TAB = $9;                SDLK_BACKSLASH = Ord('\');
-  SDLK_SPACE = Ord(' ');        SDLK_RIGHTBRACKET = Ord(']');
-  SDLK_EXCLAIM = Ord('!');      SDLK_CARET = Ord('^');
-  SDLK_QUOTEDBL = Ord('"');     SDLK_UNDERSCORE = Ord('_');
-  SDLK_HASH = Ord('#');         SDLK_BACKQUOTE = Ord('`');
-  SDLK_DOLLAR = Ord('$');       SDLK_a = Ord('a');
-  SDLK_PERCENT = Ord('%');      SDLK_b = Ord('b');
-  SDLK_AMPERSAND = Ord('&');    SDLK_c = Ord('c');
-  SDLK_QUOTE = Ord('''');       SDLK_d = Ord('d');
-  SDLK_LEFTPAREN = Ord('(');    SDLK_e = Ord('e');
-  SDLK_RIGHTPAREN = Ord(')');   SDLK_f = Ord('f');
-  SDLK_ASTERISK = Ord('*');     SDLK_g = Ord('g');
-  SDLK_PLUS = Ord('+');         SDLK_h = Ord('h');
-  SDLK_COMMA = Ord(',');        SDLK_i = Ord('i');
-  SDLK_MINUS = Ord('-');        SDLK_j = Ord('j');
-  SDLK_PERIOD = Ord('.');       SDLK_k = Ord('k');
-  SDLK_SLASH = Ord('/');        SDLK_l = Ord('l');
-  SDLK_0 = Ord('0');            SDLK_m = Ord('m');
-  SDLK_1 = Ord('1');            SDLK_n = Ord('n');
-  SDLK_2 = Ord('2');            SDLK_o = Ord('o');
-  SDLK_3 = Ord('3');            SDLK_p = Ord('p');
-  SDLK_4 = Ord('4');            SDLK_q = Ord('q');
-  SDLK_5 = Ord('5');            SDLK_r = Ord('r');
-  SDLK_6 = Ord('6');            SDLK_s = Ord('s');
-  SDLK_7 = Ord('7');            SDLK_t = Ord('t');
-  SDLK_8 = Ord('8');            SDLK_u = Ord('u');
-  SDLK_9 = Ord('9');            SDLK_v = Ord('v');
-  SDLK_COLON = Ord(':');        SDLK_w = Ord('w');
-  SDLK_SEMICOLON = Ord(';');    SDLK_x = Ord('x');
-  SDLK_LESS = Ord('<');         SDLK_y = Ord('y');
-  SDLK_EQUALS = Ord('=');       SDLK_z = Ord('z');
+  SDLK_RETURN = $D;
+  SDLK_ESCAPE = $1B;
+  SDLK_BACKSPACE = $8;
+  SDLK_TAB = $9;
+  SDLK_SPACE = Ord(' ');
+  SDLK_EXCLAIM = Ord('!');
+  SDLK_QUOTEDBL = Ord('"');
+  SDLK_HASH = Ord('#');
+  SDLK_DOLLAR = Ord('$');
+  SDLK_PERCENT = Ord('%');
+  SDLK_AMPERSAND = Ord('&');
+  SDLK_QUOTE = Ord('''');
+  SDLK_LEFTPAREN = Ord('(');
+  SDLK_RIGHTPAREN = Ord(')');
+  SDLK_ASTERISK = Ord('*');
+  SDLK_PLUS = Ord('+');
+  SDLK_COMMA = Ord(',');
+  SDLK_MINUS = Ord('-');
+  SDLK_PERIOD = Ord('.');
+  SDLK_SLASH = Ord('/');
+  SDLK_0 = Ord('0');
+  SDLK_1 = Ord('1');
+  SDLK_2 = Ord('2');
+  SDLK_3 = Ord('3');
+  SDLK_4 = Ord('4');
+  SDLK_5 = Ord('5');
+  SDLK_6 = Ord('6');
+  SDLK_7 = Ord('7');
+  SDLK_8 = Ord('8');
+  SDLK_9 = Ord('9');
+  SDLK_COLON = Ord(':');
+  SDLK_SEMICOLON = Ord(';');
+  SDLK_LESS = Ord('<');
+  SDLK_EQUALS = Ord('=');
   SDLK_GREATER = Ord('>');
+  SDLK_QUESTION = Ord('?');
+  SDLK_AT = Ord('@');
+
+  SDLK_LEFTBRACKET = Ord('[');
+  SDLK_BACKSLASH = Ord('\');
+  SDLK_RIGHTBRACKET = Ord(']');
+  SDLK_CARET = Ord('^');
+  SDLK_UNDERSCORE = Ord('_');
+  SDLK_BACKQUOTE = Ord('`');
+  SDLK_a = Ord('a');
+  SDLK_b = Ord('b');
+  SDLK_c = Ord('c');
+  SDLK_d = Ord('d');
+  SDLK_e = Ord('e');
+  SDLK_f = Ord('f');
+  SDLK_g = Ord('g');
+  SDLK_h = Ord('h');
+  SDLK_i = Ord('i');
+  SDLK_j = Ord('j');
+  SDLK_k = Ord('k');
+  SDLK_l = Ord('l');
+  SDLK_m = Ord('m');
+  SDLK_n = Ord('n');
+  SDLK_o = Ord('o');
+  SDLK_p = Ord('p');
+  SDLK_q = Ord('q');
+  SDLK_r = Ord('r');
+  SDLK_s = Ord('s');
+  SDLK_t = Ord('t');
+  SDLK_u = Ord('u');
+  SDLK_v = Ord('v');
+  SDLK_w = Ord('w');
+  SDLK_x = Ord('x');
+  SDLK_y = Ord('y');
+  SDLK_z = Ord('z');
 
   SDLK_CAPSLOCK = SDL_SCANCODE_CAPSLOCK S2K;
 
@@ -1814,24 +1945,24 @@ const
   SDLK_EJECT = SDL_SCANCODE_EJECT S2K;
   SDLK_SLEEP = SDL_SCANCODE_SLEEP S2K;
 
-  KMOD_NONE     = $0000;
-  KMOD_LSHIFT   = $0001;
-  KMOD_RSHIFT   = $0002;
-  KMOD_LCTRL    = $0040;
-  KMOD_RCTRL    = $0080;
-  KMOD_LALT     = $0100;
-  KMOD_RALT     = $0200;
-  KMOD_LGUI     = $0400;
-  KMOD_RGUI     = $0800;
-  KMOD_NUM      = $1000;
-  KMOD_CAPS     = $2000;
-  KMOD_MODE     = $4000;
+  KMOD_NONE = $0000;
+  KMOD_LSHIFT = $0001;
+  KMOD_RSHIFT = $0002;
+  KMOD_LCTRL = $0040;
+  KMOD_RCTRL = $0080;
+  KMOD_LALT = $0100;
+  KMOD_RALT = $0200;
+  KMOD_LGUI = $0400;
+  KMOD_RGUI = $0800;
+  KMOD_NUM = $1000;
+  KMOD_CAPS = $2000;
+  KMOD_MODE = $4000;
   KMOD_RESERVED = $8000;
 
-  KMOD_CTRL  = KMOD_LCTRL or KMOD_RCTRL;
+  KMOD_CTRL = KMOD_LCTRL or KMOD_RCTRL;
   KMOD_SHIFT = KMOD_LSHIFT or KMOD_RSHIFT;
-  KMOD_ALT   = KMOD_LALT or KMOD_RALT;
-  KMOD_GUI   = KMOD_LGUI or KMOD_RGUI;
+  KMOD_ALT = KMOD_LALT or KMOD_RALT;
+  KMOD_GUI = KMOD_LGUI or KMOD_RGUI;
 
 type
   PSDL_KeyCode = ^TSDL_KeyCode;
@@ -1974,7 +2105,7 @@ procedure SDL_JoystickClose(joystick: PSDL_Joystick); lSDL;
 
 type
   SDL_GameControllerBindType=(
-    SDL_CONTROLLER_BINDTYPE_NONE,
+    SDL_CONTROLLER_BINDTYPE_NONE=0,
     SDL_CONTROLLER_BINDTYPE_BUTTON,
     SDL_CONTROLLER_BINDTYPE_AXIS,
     SDL_CONTROLLER_BINDTYPE_HAT);
@@ -2013,13 +2144,15 @@ type
   PSDL_GameControllerButtonBind = ^TSDL_GameControllerButtonBind;
   TSDL_GameControllerButtonBind = record
     bindType: SDL_GameControllerBindType;
-    case integer of
-      1: (button: longint);
-      2: (axis: longint);
-      3: (value: record
-            hat,
-            hat_mask: longint;
-          end);
+    value: record
+      case longint of
+        1: (button: longint);
+        2: (axis: longint);
+        3: (hat: record
+              hat,
+              hat_mask: longint;
+            end);
+    end;
   end;
 
 //https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
@@ -2121,7 +2254,7 @@ type
     period: Uint16;
     magnitude,
     offset: Sint16;
-    phase: Uint16;
+    phase,
     attack_length,
     attack_level,
     fade_length,
@@ -2136,9 +2269,9 @@ type
     delay,
     button,
     interval: Uint16;
-    right_sat: array[0..2] of Uint16;
+    right_sat,
     left_sat: array[0..2] of Uint16;
-    right_coeff: array[0..2] of Sint16;
+    right_coeff,
     left_coeff: array[0..2] of Sint16;
     deadband: array[0..2] of Uint16;
     center: array[0..2] of Sint16;
@@ -2364,7 +2497,7 @@ type
     timestamp,
     windowID: Uint32;
     state,
-    _repeat,
+    repeat_,
     padding2,
     padding3: UInt8;
     keysym: TSDL_KeySym;
