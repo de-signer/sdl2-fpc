@@ -53,9 +53,9 @@ type
 {$ENDIF}
 
 const
-  SDL_NET_MAJOR_VERSION = 2;
-  SDL_NET_MINOR_VERSION = 0;
-  SDL_NET_PATCHLEVEL    = 0;
+  SDL_NET_MAJOR_VERSION=2;
+  SDL_NET_MINOR_VERSION=0;
+  SDL_NET_PATCHLEVEL   =0;
 
 procedure SDL_NET_VERSION(x: PSDLNet_version);
 function SDLNet_Linked_Version: PSDLNet_version; lSDL;
@@ -65,16 +65,16 @@ procedure SDLNet_Quit; lSDL;
 
 type
   PIPaddress =^TIPaddress;
-  TIPaddress = record
+  TIPaddress=record
     host: Uint32;
     port: Uint16;
   end;
 
 const
-  INADDR_ANY       = $00000000;
-  INADDR_NONE      = $FFFFFFFF;
-  INADDR_LOOPBACK  = $7f000001;
-  INADDR_BROADCAST = $FFFFFFFF;
+  INADDR_ANY      =$00000000;
+  INADDR_NONE     =$FFFFFFFF;
+  INADDR_LOOPBACK =$7f000001;
+  INADDR_BROADCAST=$FFFFFFFF;
 
 function SDLNet_ResolveHost(address: PIPaddress;
                             const host: pchar;
@@ -93,16 +93,16 @@ function SDLNet_TCP_Send(sock: PTCPsocket;
                          const data: pointer;
                          len: longint): longint; lSDL;
 function SDLNet_TCP_Recv(sock: PTCPsocket;
-                         data: pointer; 
+                         data: pointer;
                          len: longint): longint; lSDL;
 procedure SDLNet_TCP_Close(sock: PTCPsocket); lSDL;
 
 type
-  PUDPsocket = pointer;
+  PUDPsocket=pointer;
 
-  PPUDPpacket = ^PUDPpacket;
-  PUDPpacket = ^TUDPpacket;
-  TUDPpacket = record
+  PPUDPpacket=^PUDPpacket;
+  PUDPpacket=^TUDPpacket;
+  TUDPpacket=record
     channel: longint;
     data: PUint8;
     len: longint;
@@ -139,10 +139,10 @@ function SDLNet_UDP_Recv(sock: PUDPsocket; packet: PUDPpacket): longint; lSDL;
 procedure SDLNet_UDP_Close(sock: PUDPsocket); lSDL;
 
 type
-  PSDLNet_SocketSet = pointer;
+  PSDLNet_SocketSet=pointer;
 
-  PSDLNet_GenericSocket = ^TSDLNet_GenericSocket;
-  TSDLNet_GenericSocket = record
+  PSDLNet_GenericSocket=^TSDLNet_GenericSocket;
+  TSDLNet_GenericSocket=record
     ready: longint;
   end;
 

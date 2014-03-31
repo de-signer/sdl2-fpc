@@ -1,5 +1,12 @@
 SDL2 headers for Free Pascal
 
+1.09 (31.03.14)
+  Fixed records:
+    SDL_TextEditingEvent
+    SDL_TextInputEvent
+    SDL_JoyAxisEvent
+    SDL_Event
+
 1.08 (30.03.14)
   SDL 2.0.3
   Fixed size_t
