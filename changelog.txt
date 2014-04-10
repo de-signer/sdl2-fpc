@@ -1,5 +1,8 @@
 SDL2 headers for Free Pascal
 
+1.10 (10.04.14)
+  Prefixes converted into suffixes ("_file" > "file_", etc)
+
 1.09 (31.03.14)
   Fixed records:
     SDL_TextEditingEvent

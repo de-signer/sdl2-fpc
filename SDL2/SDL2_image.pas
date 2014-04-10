@@ -50,19 +50,19 @@ procedure IMG_Quit; lSDL;
 
 function IMG_LoadTyped_RW(src: PSDL_RWops;
                           freesrc: longint;
-                          const _type: pchar): PSDL_Surface; lSDL;
-function IMG_Load(const _file: pchar): PSDL_Surface; lSDL;
+                          const type_: pchar): PSDL_Surface; lSDL;
+function IMG_Load(const file_: pchar): PSDL_Surface; lSDL;
 function IMG_Load_RW(src: PSDL_RWops; freesrc: longint): PSDL_Surface; lSDL;
 
 function IMG_LoadTexture(renderer: PSDL_Renderer;
-                         const _file: pchar): PSDL_Texture; lSDL;
+                         const file_: pchar): PSDL_Texture; lSDL;
 function IMG_LoadTexture_RW(renderer: PSDL_Renderer;
                             src: PSDL_RWops;
                             freesrc: longint): PSDL_Texture; lSDL;
 function IMG_LoadTextureTyped_RW(renderer: PSDL_Renderer;
                                  src: PSDL_RWops;
                                  freesrc: longint;
-                                 const _type: pchar): PSDL_Texture; lSDL;
+                                 const type_: pchar): PSDL_Texture; lSDL;
 
 function IMG_isICO(src: PSDL_RWops): longint; lSDL;
 function IMG_isCUR(src: PSDL_RWops): longint; lSDL;
@@ -98,7 +98,7 @@ function IMG_LoadWEBP_RW(src: PSDL_RWops): PSDL_Surface; lSDL;
 function IMG_ReadXPMFromArray(xpm: ppchar): PSDL_Surface; lSDL;
 
 function IMG_SavePNG(surface: PSDL_Surface;
-                     const _file: pchar): longint; lSDL;
+                     const file_: pchar): longint; lSDL;
 function IMG_SavePNG_RW(surface: PSDL_Surface;
                         dst: PSDL_RWops;
                         freedst: longint): longint; lSDL;

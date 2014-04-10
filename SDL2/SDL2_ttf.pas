@@ -59,8 +59,8 @@ procedure TTF_ByteSwappedUNICODE(swapped: longint); lSDL;
 
 function TTF_Init: longint; lSDL;
 
-function TTF_OpenFont(const _file: pchar; ptsize: longint): PTTF_Font; lSDL;
-function TTF_OpenFontIndex(const _file: pchar; ptsize, index: longint): PTTF_Font; lSDL;
+function TTF_OpenFont(const file_: pchar; ptsize: longint): PTTF_Font; lSDL;
+function TTF_OpenFontIndex(const file_: pchar; ptsize, index: longint): PTTF_Font; lSDL;
 function TTF_OpenFontRW(src: PSDL_RWops; freesrc, ptsize: longint): PTTF_Font; lSDL;
 function TTF_OpenFontIndexRW(src: PSDL_RWops; freesrc, ptsize, index: longint): PTTF_Font; lSDL;
 

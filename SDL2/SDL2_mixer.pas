@@ -102,11 +102,11 @@ function Mix_QuerySpec(frequency: plongint;
                        channels: plongint): longint; lSDL;
 
 function Mix_LoadWAV_RW(src: PSDL_RWops; freesrc: longint): PMix_Chunk; lSDL;
-function Mix_LoadWAV(_file: pchar): PMix_Chunk;
-function Mix_LoadMUS(const _file: pchar): PMix_Music; lSDL;
+function Mix_LoadWAV(file_: pchar): PMix_Chunk;
+function Mix_LoadMUS(const file_: pchar): PMix_Music; lSDL;
 function Mix_LoadMUS_RW(src: PSDL_RWops; freesrc: longint): PMix_Music; lSDL;
 function Mix_LoadMUSType_RW(src: PSDL_RWops;
-                            _type: TMix_MusicType;
+                            type_: TMix_MusicType;
                             freesrc: longint): PMix_Music; lSDL;
 function Mix_QuickLoad_WAV(mem: PUint8): PMix_Chunk; lSDL;
 function Mix_QuickLoad_RAW(mem: PUint8; len: Uint32): PMix_Chunk; lSDL;
@@ -158,7 +158,7 @@ function Mix_SetReverseStereo(channel, flip: longint): longint; lSDL;
 function Mix_ReserveChannels(num: longint): longint; lSDL;
 
 function Mix_GroupChannel(which, tag: longint): longint; lSDL;
-function Mix_GroupChannels(from, _to, tag: longint): longint; lSDL;
+function Mix_GroupChannels(from, to_, tag: longint): longint; lSDL;
 function Mix_GroupAvailable(tag: longint): longint; lSDL;
 function Mix_GroupCount(tag: longint): longint; lSDL;
 function Mix_GroupOldest(tag: longint): longint; lSDL;
@@ -248,9 +248,9 @@ begin
   x^.patch:=SDL_MIXER_PATCHLEVEL;
 end;
 
-function Mix_LoadWAV(_file: pchar): PMix_Chunk;
+function Mix_LoadWAV(file_: pchar): PMix_Chunk;
 begin
-  Mix_LoadWAV:=Mix_LoadWAV_RW(SDL_RWFromFile(_file, 'r'), 1);
+  Mix_LoadWAV:=Mix_LoadWAV_RW(SDL_RWFromFile(file_, 'r'), 1);
 end;
 
 function Mix_PlayChannel(channel: longint; chunk: PMix_Chunk;

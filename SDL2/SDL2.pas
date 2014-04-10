@@ -528,7 +528,7 @@ type
     end;
   end;
 
-function SDL_RWFromFile(const _file: pchar;
+function SDL_RWFromFile(const file_: pchar;
                         const mode: pchar): PSDL_RWops; lSDL;
 function SDL_RWFromFP(fp: pointer; autoclose: SDL_bool): PSDL_RWops; lSDL;
 function SDL_RWFromMem(mem: pointer; size: longint): PSDL_RWops; lSDL;
@@ -788,10 +788,7 @@ const
 type
   PSDL_Color=^TSDL_Color;
   TSDL_Color=record
-    r,
-    g,
-    b,
-    a: Uint8;
+    r, g, b, a: Uint8;
   end;
 
   TSDL_Colour=TSDL_Color;
@@ -938,10 +935,10 @@ function SDL_SetSurfacePalette(surface: PSDL_Surface;
 function SDL_LockSurface(surface: PSDL_Surface): longint; lSDL;
 procedure SDL_UnlockSurface(surface: PSDL_Surface); lSDL;
 function SDL_LoadBMP_RW(src: PSDL_RWops; freesrc: longint): PSDL_Surface; lSDL;
-function SDL_LoadBMP(_file: pchar): PSDL_Surface;
+function SDL_LoadBMP(file_: pchar): PSDL_Surface;
 function SDL_SaveBMP_RW(surface: PSDL_Surface; dst: PSDL_RWops;
                         freedst: longint): longint; lSDL;
-function SDL_SaveBMP(surface: PSDL_Surface; _file: pchar): longint;
+function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint;
 function SDL_SetSurfaceRLE(surface: PSDL_Surface; flag: longint): longint; lSDL;
 function SDL_SetColorKey(surface: PSDL_Surface; flag: longint;
                          key: Uint32): longint; lSDL;
@@ -2151,7 +2148,7 @@ type
 //https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
 function SDL_GameControllerAddMappingsFromRW(rw: PSDL_RWops;
                                              freerw: longint): longint; lSDL;
-function SDL_GameControllerAddMappingsFromFile(_file: pchar): longint;
+function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint;
 
 {
 This string shows an example of a valid mapping for a controller
@@ -2666,7 +2663,7 @@ type
   TSDL_DropEvent=record
     type_,
     timestamp: Uint32;
-    _file: pchar;
+    file_: pchar;
   end;
 
   TSDL_QuitEvent=record
@@ -2862,22 +2859,22 @@ end;
 
 //=====SDL_SURFACE=====
 
-function SDL_LoadBMP(_file: pchar): PSDL_Surface;
+function SDL_LoadBMP(file_: pchar): PSDL_Surface;
 begin
-  SDL_LoadBMP:=SDL_LoadBMP_RW(SDL_RWFromFile(_file, 'r'), 1);
+  SDL_LoadBMP:=SDL_LoadBMP_RW(SDL_RWFromFile(file_, 'r'), 1);
 end;
 
-function SDL_SaveBMP(surface: PSDL_Surface; _file: pchar): longint;
+function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint;
 begin
-  SDL_SaveBMP:=SDL_SaveBMP_RW(surface, SDL_RWFromFile(_file, 'w'), 1);
+  SDL_SaveBMP:=SDL_SaveBMP_RW(surface, SDL_RWFromFile(file_, 'w'), 1);
 end;
 
 //=====SDL_GAMECONTROLLER=====
 
-function SDL_GameControllerAddMappingsFromFile(_file: pchar): longint;
+function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint;
 begin
   SDL_GameControllerAddMappingsFromFile:=SDL_GameControllerAddMappingsFromRW(
-    SDL_RWFromFile(_file, 'r'), 1);
+    SDL_RWFromFile(file_, 'r'), 1);
 end;
 
 //=====SDL_EVENTS=====

@@ -147,26 +147,26 @@ type
   end;
 
 function SDLNet_AllocSocketSet(maxsockets: longint): PSDLNet_SocketSet; lSDL;
-function SDLNet_AddSocket(_set: PSDLNet_SocketSet;
+function SDLNet_AddSocket(set_: PSDLNet_SocketSet;
                           sock: PSDLNet_GenericSocket): longint; lSDL;
-function SDLNet_TCP_AddSocket(_set: PSDLNet_SocketSet;
+function SDLNet_TCP_AddSocket(set_: PSDLNet_SocketSet;
                               sock: PTCPsocket): longint;
-function SDLNet_UDP_AddSocket(_set: PSDLNet_SocketSet;
+function SDLNet_UDP_AddSocket(set_: PSDLNet_SocketSet;
                               sock: PUDPsocket): longint;
 
-function SDLNet_DelSocket(_set: PSDLNet_SocketSet;
+function SDLNet_DelSocket(set_: PSDLNet_SocketSet;
                           sock: PSDLNet_GenericSocket): longint; lSDL;
-function SDLNet_TCP_DelSocket(_set: PSDLNet_SocketSet;
+function SDLNet_TCP_DelSocket(set_: PSDLNet_SocketSet;
                               sock: PTCPsocket): longint;
-function SDLNet_UDP_DelSocket(_set: PSDLNet_SocketSet;
+function SDLNet_UDP_DelSocket(set_: PSDLNet_SocketSet;
                               sock: PUDPsocket): longint;
 
-function SDLNet_CheckSockets(_set: PSDLNet_SocketSet;
+function SDLNet_CheckSockets(set_: PSDLNet_SocketSet;
                              timeout: Uint32): longint; lSDL;
 
 function SDLNet_SocketReady(sock: PSDLNet_GenericSocket): longint;
 
-procedure SDLNet_FreeSocketSet(_set: PSDLNet_SocketSet); lSDl;
+procedure SDLNet_FreeSocketSet(set_: PSDLNet_SocketSet); lSDl;
 
 procedure SDLNet_SetError(const fmt: pchar); lSDL; varargs;
 function SDLNet_GetError: pchar; lSDL;
@@ -189,24 +189,24 @@ begin
   x^.patch:=SDL_NET_PATCHLEVEL;
 end;
 
-function SDLNet_TCP_AddSocket(_set: PSDLNet_SocketSet; sock: PTCPsocket): longint;
+function SDLNet_TCP_AddSocket(set_: PSDLNet_SocketSet; sock: PTCPsocket): longint;
 begin
-  SDLNet_TCP_AddSocket:=SDLNet_TCP_AddSocket(_set, PSDLNet_GenericSocket(sock));
+  SDLNet_TCP_AddSocket:=SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
 end;
 
-function SDLNet_UDP_AddSocket(_set: PSDLNet_SocketSet; sock: PUDPsocket): longint;
+function SDLNet_UDP_AddSocket(set_: PSDLNet_SocketSet; sock: PUDPsocket): longint;
 begin
-  SDLNet_UDP_AddSocket:=SDLNet_TCP_AddSocket(_set, PSDLNet_GenericSocket(sock));
+  SDLNet_UDP_AddSocket:=SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
 end;
 
-function SDLNet_TCP_DelSocket(_set: PSDLNet_SocketSet; sock: PTCPsocket): longint;
+function SDLNet_TCP_DelSocket(set_: PSDLNet_SocketSet; sock: PTCPsocket): longint;
 begin
-  SDLNet_TCP_DelSocket:=SDLNet_TCP_AddSocket(_set, PSDLNet_GenericSocket(sock));
+  SDLNet_TCP_DelSocket:=SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
 end;
 
-function SDLNet_UDP_DelSocket(_set: PSDLNet_SocketSet; sock: PUDPsocket): longint;
+function SDLNet_UDP_DelSocket(set_: PSDLNet_SocketSet; sock: PUDPsocket): longint;
 begin
-  SDLNet_UDP_DelSocket:=SDLNet_TCP_AddSocket(_set, PSDLNet_GenericSocket(sock));
+  SDLNet_UDP_DelSocket:=SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
 end;
 
 function SDLNet_SocketReady(sock: PSDLNet_GenericSocket): longint;
