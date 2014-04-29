@@ -17,6 +17,7 @@ interface
 uses SDL2;
 
 {$MACRO ON}
+{$INLINE ON}
 {$PACKRECORDS C}
 
 {$IFDEF WINDOWS}
@@ -42,7 +43,7 @@ const
   IMG_INIT_TIF =$00000004;
   IMG_INIT_WEBP=$00000008;
 
-procedure SDL_IMAGE_VERSION(x: PSDL_Version);
+procedure SDL_IMAGE_VERSION(x: PSDL_Version); inline;
 function IMG_Linked_Version: PSDL_Version; lSDL;
 
 function IMG_Init(flags: longint): longint; lSDL;
@@ -109,7 +110,7 @@ function IMG_GetError: pchar; cdecl; external name 'SDL_GetError';
 
 implementation
 
-procedure SDL_IMAGE_VERSION(x: PSDL_Version);
+procedure SDL_IMAGE_VERSION(x: PSDL_Version); inline;
 begin
   x^.major:=SDL_IMAGE_MAJOR_VERSION;
   x^.minor:=SDL_IMAGE_MINOR_VERSION;

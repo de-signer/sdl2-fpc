@@ -17,6 +17,7 @@ interface
 uses SDL2;
 
 {$MACRO ON}
+{$INLINE ON}
 {$PACKRECORDS C}
 
 {$IFDEF WINDOWS}
@@ -87,7 +88,7 @@ type
 
   PMix_Music=pointer;
 
-procedure SDL_MIXER_VERSION(x: PSDL_Version);
+procedure SDL_MIXER_VERSION(x: PSDL_Version); inline;
 
 function Mix_Init(flags: longint): longint; lSDL;
 procedure Mix_Quit; lSDL;
@@ -102,7 +103,7 @@ function Mix_QuerySpec(frequency: plongint;
                        channels: plongint): longint; lSDL;
 
 function Mix_LoadWAV_RW(src: PSDL_RWops; freesrc: longint): PMix_Chunk; lSDL;
-function Mix_LoadWAV(file_: pchar): PMix_Chunk;
+function Mix_LoadWAV(file_: pchar): PMix_Chunk; inline;
 function Mix_LoadMUS(const file_: pchar): PMix_Music; lSDL;
 function Mix_LoadMUS_RW(src: PSDL_RWops; freesrc: longint): PMix_Music; lSDL;
 function Mix_LoadMUSType_RW(src: PSDL_RWops;
@@ -166,7 +167,7 @@ function Mix_GroupNewer(tag: longint): longint; lSDL;
 
 function Mix_PlayChannel(channel: longint;
                          chunk: PMix_Chunk;
-                         loops: longint): longint;
+                         loops: longint): longint; inline;
 function Mix_PlayChannelTimed(channel: longint;
                               chunk: PMix_Chunk;
                               loops,
@@ -180,7 +181,7 @@ function Mix_FadeInMusicPos(music: PMix_Music;
                             position: double): longint; lSDL;
 function Mix_FadeInChannel(channel: longint;
                            chunk: PMix_Chunk;
-                           loops, ms: longint): longint;
+                           loops, ms: longint): longint; inline;
 function Mix_FadeInChannelTimed(channel: longint;
                                 chunk: PMix_Chunk;
                                 loops,
@@ -241,26 +242,26 @@ function Mix_GetError: pchar; cdecl; external name 'SDL_GetError';
 
 implementation
 
-procedure SDL_MIXER_VERSION(x: PSDL_Version);
+procedure SDL_MIXER_VERSION(x: PSDL_Version); inline;
 begin
   x^.major:=SDL_MIXER_MAJOR_VERSION;
   x^.minor:=SDL_MIXER_MINOR_VERSION;
   x^.patch:=SDL_MIXER_PATCHLEVEL;
 end;
 
-function Mix_LoadWAV(file_: pchar): PMix_Chunk;
+function Mix_LoadWAV(file_: pchar): PMix_Chunk; inline;
 begin
   Mix_LoadWAV:=Mix_LoadWAV_RW(SDL_RWFromFile(file_, 'r'), 1);
 end;
 
 function Mix_PlayChannel(channel: longint; chunk: PMix_Chunk;
-                         loops: longint): longint;
+                         loops: longint): longint; inline;
 begin
   Mix_PlayChannel:=Mix_PlayChannelTimed(channel, chunk, loops, -1);
 end;
 
 function Mix_FadeInChannel(channel: longint; chunk: PMix_Chunk;
-                           loops, ms: longint): longint;
+                           loops, ms: longint): longint; inline;
 begin
   Mix_FadeInChannel:=Mix_FadeInChannelTimed(channel, chunk, loops, ms, -1);
 end;

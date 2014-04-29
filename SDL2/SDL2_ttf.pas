@@ -17,6 +17,7 @@ interface
 uses SDL2;
 
 {$MACRO ON}
+{$INLINE ON}
 {$PACKRECORDS C}
 
 {$IFDEF WINDOWS}
@@ -52,7 +53,7 @@ const
 type
   PTTF_Font=pointer;
 
-procedure SDL_TTF_VERSION(x: PSDL_Version);
+procedure SDL_TTF_VERSION(x: PSDL_Version); inline;
 function TTF_Linked_Version: PSDL_Version; lSDL;
 
 procedure TTF_ByteSwappedUNICODE(swapped: longint); lSDL;
@@ -173,7 +174,7 @@ function TTF_GetError: pchar; cdecl; external name 'SDL_GetError';
 
 implementation
 
-procedure SDL_TTF_VERSION(x: PSDL_Version);
+procedure SDL_TTF_VERSION(x: PSDL_Version); inline;
 begin
   x^.major:=SDL_TTF_MAJOR_VERSION;
   x^.minor:=SDL_TTF_MINOR_VERSION;

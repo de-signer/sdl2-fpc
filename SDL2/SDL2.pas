@@ -26,6 +26,7 @@ unit SDL2;
 interface
 
 {$MACRO ON}
+{$INLINE ON}
 {$PACKRECORDS C}
 
 {$IFDEF WINDOWS}
@@ -200,7 +201,7 @@ type
     patch: Uint8;
   end;
 
-procedure SDL_VERSION(x: PSDL_Version);
+procedure SDL_VERSION(x: PSDL_Version); inline;
 
 procedure SDL_GetVersion(ver: PSDL_version); lSDL;
 function SDL_GetRevision: pchar; lSDL;
@@ -369,7 +370,7 @@ type
   TSDL_TimerID=longint;
 
 function SDL_GetTicks: Uint32; lSDL;
-function SDL_TICKS_PASSED(a, b: Uint32): SDL_bool;
+function SDL_TICKS_PASSED(a, b: Uint32): SDL_bool; inline;
 function SDL_GetPerformanceCounter: Uint64; lSDL;
 function SDL_GetPerformanceFrequency: Uint64; lSDL;
 procedure SDL_Delay(ms: Uint32); lSDL;
@@ -538,14 +539,15 @@ function SDL_RWFromConstMem(const mem: pointer;
 function SDL_AllocRW: PSDL_RWops; lSDL;
 procedure SDL_FreeRW(area: PSDL_RWops); lSDL;
 
-function SDL_RWsize(ctx: PSDL_RWops): Sint64;
-function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64; whence: longint): Sint64;
-function SDL_RWtell(ctx: PSDL_RWops): Sint64;
+function SDL_RWsize(ctx: PSDL_RWops): Sint64; inline;
+function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64;
+                    whence: longint): Sint64; inline;
+function SDL_RWtell(ctx: PSDL_RWops): Sint64; inline;
 function SDL_RWread(ctx: PSDL_RWops; ptr: pointer;
-                    size ,n: longword): longword;
+                    size ,n: longword): longword; inline;
 function SDL_RWwrite(ctx: PSDL_RWops; ptr: pointer;
-                     size, n: longword): longword;
-function SDL_RWclose(ctx: PSDL_RWops): longint;
+                     size, n: longword): longword; inline;
+function SDL_RWclose(ctx: PSDL_RWops): longint; inline;
 
 function SDL_ReadU8(src: PSDL_RWops): Uint8; lSDL;
 function SDL_ReadLE16(src: PSDL_RWops): Uint16; lSDL;
@@ -862,8 +864,8 @@ type
     w, h: longint;
   end;
 
-function SDL_RectEmpty(const x: PSDL_Rect): SDL_bool;
-function SDL_RectEquals(const a, b: PSDL_Rect): SDL_bool;
+function SDL_RectEmpty(const x: PSDL_Rect): SDL_bool; inline;
+function SDL_RectEquals(const a, b: PSDL_Rect): SDL_bool; inline;
 
 function SDL_HasIntersection(const a, b: PSDL_Rect): SDL_bool; lSDL;
 function SDL_IntersectRect(const a, b: PSDL_Rect;
@@ -935,10 +937,10 @@ function SDL_SetSurfacePalette(surface: PSDL_Surface;
 function SDL_LockSurface(surface: PSDL_Surface): longint; lSDL;
 procedure SDL_UnlockSurface(surface: PSDL_Surface); lSDL;
 function SDL_LoadBMP_RW(src: PSDL_RWops; freesrc: longint): PSDL_Surface; lSDL;
-function SDL_LoadBMP(file_: pchar): PSDL_Surface;
+function SDL_LoadBMP(file_: pchar): PSDL_Surface; inline;
 function SDL_SaveBMP_RW(surface: PSDL_Surface; dst: PSDL_RWops;
                         freedst: longint): longint; lSDL;
-function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint;
+function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint; inline;
 function SDL_SetSurfaceRLE(surface: PSDL_Surface; flag: longint): longint; lSDL;
 function SDL_SetColorKey(surface: PSDL_Surface; flag: longint;
                          key: Uint32): longint; lSDL;
@@ -2148,7 +2150,7 @@ type
 //https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
 function SDL_GameControllerAddMappingsFromRW(rw: PSDL_RWops;
                                              freerw: longint): longint; lSDL;
-function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint;
+function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint; inline;
 
 {
 This string shows an example of a valid mapping for a controller
@@ -2762,7 +2764,7 @@ procedure SDL_AddEventWatch(filter: TSDL_EventFilter; userdata: pointer); lSDL;
 procedure SDL_DelEventWatch(filter: TSDL_EventFilter; userdata: pointer); lSDL;
 procedure SDL_FilterEvents(filter: TSDL_EventFilter; userdata: pointer); lSDL;
 function SDL_EventState(type_: Uint32; state: longint): Uint8; lSDL;
-function SDL_GetEventState(type_: Uint32): Uint8;
+function SDL_GetEventState(type_: Uint32): Uint8; inline;
 function SDL_RegisterEvents(numevents: longint): Uint32; lSDL;
 
 //=====SDL_SYSTEM=====
@@ -2797,7 +2799,7 @@ implementation
 
 //=====SDL_VERSION=====
 
-procedure SDL_VERSION(x: PSDL_Version);
+procedure SDL_VERSION(x: PSDL_Version); inline;
 begin
   x^.major:=SDL_MAJOR_VERSION;
   x^.minor:=SDL_MINOR_VERSION;
@@ -2806,19 +2808,20 @@ end;
 
 //=====SDL_TIMER=====
 
-function SDL_TICKS_PASSED(a, b: Uint32): SDL_bool;
+function SDL_TICKS_PASSED(a, b: Uint32): SDL_bool; inline;
 begin
   SDL_TICKS_PASSED:=(b-a)<=0;
 end;
 
 //=====SDL_RWOPS=====
 
-function SDL_RWsize(ctx: PSDL_RWops): Sint64;
+function SDL_RWsize(ctx: PSDL_RWops): Sint64; inline;
 begin
   SDL_RWsize:=ctx^.size(ctx);
 end;
 
-function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64; whence: longint): Sint64;
+function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64;
+                    whence: longint): Sint64; inline;
 begin
   SDL_RWseek:=ctx^.seek(ctx,offset,whence);
 end;
@@ -2829,49 +2832,49 @@ begin
 end;
 
 function SDL_RWread(ctx: PSDL_RWops; ptr: pointer; size: longword;
-                    n: longword): longword;
+                    n: longword): longword; inline;
 begin
   SDL_RWread:=ctx^.read(ctx, ptr, size, n);
 end;
 
 function SDL_RWwrite(ctx: PSDL_RWops; ptr: pointer; size: longword;
-                     n: longword): longword;
+                     n: longword): longword; inline;
 begin
   SDL_RWwrite:=ctx^.write(ctx, ptr, size, n);
 end;
 
-function SDL_RWclose(ctx: PSDL_RWops): longint;
+function SDL_RWclose(ctx: PSDL_RWops): longint; inline;
 begin
   SDL_RWclose:=ctx^.close(ctx);
 end;
 
 //=====SDL_RECT=====
 
-function SDL_RectEmpty(const x: PSDL_Rect): SDL_bool;
+function SDL_RectEmpty(const x: PSDL_Rect): SDL_bool; inline;
 begin
   SDL_RectEmpty:=(x^.w<=0) or (x^.h<=0);
 end;
 
-function SDL_RectEquals(const a, b: PSDL_Rect): SDL_bool;
+function SDL_RectEquals(const a, b: PSDL_Rect): SDL_bool; inline;
 begin
   SDL_RectEquals:=(a^.x=b^.x) and (a^.y=b^.y) and (a^.w=b^.w) and (a^.h=b^.h);
 end;
 
 //=====SDL_SURFACE=====
 
-function SDL_LoadBMP(file_: pchar): PSDL_Surface;
+function SDL_LoadBMP(file_: pchar): PSDL_Surface; inline;
 begin
   SDL_LoadBMP:=SDL_LoadBMP_RW(SDL_RWFromFile(file_, 'r'), 1);
 end;
 
-function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint;
+function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint; inline;
 begin
   SDL_SaveBMP:=SDL_SaveBMP_RW(surface, SDL_RWFromFile(file_, 'w'), 1);
 end;
 
 //=====SDL_GAMECONTROLLER=====
 
-function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint;
+function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint; inline;
 begin
   SDL_GameControllerAddMappingsFromFile:=SDL_GameControllerAddMappingsFromRW(
     SDL_RWFromFile(file_, 'r'), 1);
@@ -2879,7 +2882,7 @@ end;
 
 //=====SDL_EVENTS=====
 
-function SDL_GetEventState(type_: Uint32): Uint8;
+function SDL_GetEventState(type_: Uint32): Uint8; inline;
 begin
   SDL_GetEventState:=SDL_EventState(type_, SDL_QUERY);
 end;
