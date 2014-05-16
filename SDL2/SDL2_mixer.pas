@@ -20,11 +20,7 @@ uses SDL2;
 {$INLINE ON}
 {$PACKRECORDS C}
 
-{$IFDEF WINDOWS}
-  {$DEFINE lSDL:=cdecl; external 'SDL2_mixer.dll'}
-{$ELSE}
-  {$DEFINE lSDL:=cdecl; external 'libSDL2_mixer'}
-{$ENDIF}
+{$DEFINE lSDL:=cdecl; external 'SDL2_mixer'}
 
 {$IFDEF DARWIN}
   {$linkframework SDL2}
@@ -154,7 +150,6 @@ function Mix_SetPosition(channel: longint;
                          angle: Sint16;
                          distance: Uint8): longint; lSDL;
 function Mix_SetDistance(channel: longint; distance: Uint8): longint; lSDL;
-//function Mix_SetReverb(channel: longint; echo: Uint8): longint; lSDL;
 function Mix_SetReverseStereo(channel, flip: longint): longint; lSDL;
 function Mix_ReserveChannels(num: longint): longint; lSDL;
 
@@ -237,8 +232,8 @@ function Mix_GetChunk(channel: longint): PMix_Chunk; lSDL;
 procedure Mix_CloseAudio; lSDL;
 
 function Mix_SetError(const fmt: pchar): longint; cdecl;
-                      external name 'SDL_SetError'; varargs;
-function Mix_GetError: pchar; cdecl; external name 'SDL_GetError';
+                      external 'SDL2' name 'SDL_SetError'; varargs;
+function Mix_GetError: pchar; cdecl; external 'SDL2' name 'SDL_GetError';
 
 implementation
 

@@ -1,5 +1,9 @@
 SDL2 headers for Free Pascal
 
+1.12 (16.05.14)
+  [#1] Fixed issues with external names
+  Removed platform-specific library names
+
 1.11 (29.04.14)
   Added inlining for C macros and some functions
 

@@ -20,11 +20,7 @@ uses SDL2;
 {$INLINE ON}
 {$PACKRECORDS C}
 
-{$IFDEF WINDOWS}
-  {$DEFINE lSDL:=cdecl; external 'SDL2_ttf.dll'}
-{$ELSE}
-  {$DEFINE lSDL:=cdecl; external 'libSDL2_ttf'}
-{$ENDIF}
+{$DEFINE lSDL:=cdecl; external 'SDL2_ttf'}
 
 {$IFDEF DARWIN}
   {$linkframework SDL2}
@@ -169,8 +165,8 @@ function TTF_GetFontKerningSize(font: PTTF_Font;
                                 prev_index, index: longint): longint; lSDl;
 
 function TTF_SetError(const fmt: pchar): longint; cdecl;
-                      external name 'SDL_SetError'; varargs;
-function TTF_GetError: pchar; cdecl; external name 'SDL_GetError';
+                      external 'SDL2' name 'SDL_SetError'; varargs;
+function TTF_GetError: pchar; cdecl; external 'SDL2' name 'SDL_GetError';
 
 implementation
 

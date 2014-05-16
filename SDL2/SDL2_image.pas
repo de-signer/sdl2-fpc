@@ -20,17 +20,12 @@ uses SDL2;
 {$INLINE ON}
 {$PACKRECORDS C}
 
-{$IFDEF WINDOWS}
-  {$DEFINE lSDL:=cdecl; external 'SDL2_image.dll'}
-{$ELSE}
-  {$DEFINE lSDL:=cdecl; external 'libSDL2_image'}
-{$ENDIF}
+{$DEFINE lSDL:=cdecl; external 'SDL2_image'}
 
 {$IFDEF DARWIN}
   {$linkframework SDL2}
   {$linkframework SDL2_image}
   {$linkframework Cocoa}
-  {$linkframework OpenGL}
 {$ENDIF}
 
 const
@@ -105,8 +100,8 @@ function IMG_SavePNG_RW(surface: PSDL_Surface;
                         freedst: longint): longint; lSDL;
 
 function IMG_SetError(const fmt: pchar): longint; cdecl;
-                      external name 'SDL_SetError'; varargs;
-function IMG_GetError: pchar; cdecl; external name 'SDL_GetError';
+                      external 'SDL2' name 'SDL_SetError'; varargs;
+function IMG_GetError: pchar; cdecl; external 'SDL2' name 'SDL_GetError';
 
 implementation
 

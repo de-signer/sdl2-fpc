@@ -29,11 +29,7 @@ interface
 {$INLINE ON}
 {$PACKRECORDS C}
 
-{$IFDEF WINDOWS}
-  {$DEFINE lSDL:=cdecl; external 'SDL2.dll'}
-{$ELSE}
-  {$DEFINE lSDL:=cdecl; external 'libSDL2'}
-{$ENDIF}
+{$DEFINE lSDL:=cdecl; external 'SDL2'}
 
 {$IFDEF DARWIN}
   {$linkframework SDL2}
@@ -391,12 +387,10 @@ type
   PSDL_Cond=pointer;
 
 function SDL_CreateMutex: PSDL_Mutex; lSDL;
-function SDL_MutexP(mutex: PSDL_Mutex): longint; cdecl;
-                                                external name 'SDL_LockMutex';
+function SDL_MutexP(mutex: PSDL_Mutex): longint; inline;
 function SDL_LockMutex(mutex: PSDL_Mutex): longint; lSDL;
 function SDL_TryLockMutex(mutex: PSDL_Mutex): longint; lSDL;
-function SDL_MutexV(mutex: PSDL_Mutex): longint; cdecl;
-                                                external name 'SDL_UnlockMutex';
+function SDL_MutexV(mutex: PSDL_Mutex): longint; inline;
 function SDL_UnlockMutex(mutex: PSDL_Mutex): longint; lSDL;
 procedure SDL_DestroyMutex(mutex: PSDL_Mutex); lSDL;
 
@@ -972,8 +966,7 @@ function SDL_FillRect(dst: PSDL_Surface; const rect: PSDL_Rect;
 function SDL_FillRects(dst: PSDL_Surface; const rects: PSDL_Rect;
                        count: longint; color: Uint32): longint; lSDL;
 function SDL_BlitSurface(src: PSDL_Surface; const srcrect: PSDL_Rect;
-                         dst: PSDL_Surface; dstrect: PSDL_Rect): longint; cdecl;
-                           external name 'SDL_UpperBlit';
+                        dst: PSDL_Surface; dstrect: PSDL_Rect): longint; inline;
 function SDL_UpperBlit(src: PSDL_Surface; const srcrect: PSDL_Rect;
                        dst: PSDL_Surface; dstrect: PSDL_Rect): longint; lSDL;
 function SDL_LowerBlit(src: PSDL_Surface; srcrect: PSDL_Rect; dst: PSDL_Surface;
@@ -981,8 +974,7 @@ function SDL_LowerBlit(src: PSDL_Surface; srcrect: PSDL_Rect; dst: PSDL_Surface;
 function SDL_SoftStretch(src: PSDL_Surface; const srcrect: PSDL_Rect;
                  dst: PSDL_Surface; const dstrect: PSDL_Surface): longint; lSDL;
 function SDL_BlitScaled(src: PSDL_Surface; const srcrect: PSDL_Rect;
-                        dst: PSDL_Surface; dstrect: PSDL_Rect): longint; cdecl;
-                          external name 'SDL_UpperBlitScaled';
+                        dst: PSDL_Surface; dstrect: PSDL_Rect): longint; inline;
 function SDL_UpperBlitScaled(src: PSDL_Surface; const srcrect: PSDL_Rect;
                           dst: PSDL_Surface; dstrect: PSDL_Rect): longint; lSDL;
 function SDL_LowerBlitScaled(src: PSDL_Surface; srcrect: PSDL_Rect;
@@ -1970,7 +1962,7 @@ type
   TSDL_Keysym=record
     scancode: TSDL_ScanCode;
     sym: TSDL_KeyCode;
-    _mod: UInt16;
+    mod_: UInt16;
     unused: Uint32;
   end;
 
@@ -2495,8 +2487,10 @@ type
     keysym: TSDL_KeySym;
   end;
 
-{$DEFINE SDL_TEXTEDITINGEVENT_TEXT_SIZE:=32}
+const
+  SDL_TEXTEDITINGEVENT_TEXT_SIZE=32;
 
+type
   TSDL_TextEditingEvent=record
     type_,
     timestamp,
@@ -2506,8 +2500,10 @@ type
     length: Sint32;
   end;
 
-{$DEFINE SDL_TEXTINPUTEVENT_TEXT_SIZE:=32}
+const
+  SDL_TEXTINPUTEVENT_TEXT_SIZE=32;
 
+type
   TSDL_TextInputEvent=record
     type_,
     timestamp,
@@ -2813,6 +2809,18 @@ begin
   SDL_TICKS_PASSED:=(b-a)<=0;
 end;
 
+//=====SDL_MUTEX=====
+
+function SDL_MutexP(mutex: PSDL_Mutex): longint; inline;
+begin
+  SDL_MutexP:=SDL_LockMutex(mutex);
+end;
+
+function SDL_MutexV(mutex: PSDL_Mutex): longint; inline;
+begin
+  SDL_MutexV:=SDL_UnlockMutex(mutex);
+end;
+
 //=====SDL_RWOPS=====
 
 function SDL_RWsize(ctx: PSDL_RWops): Sint64; inline;
@@ -2870,6 +2878,18 @@ end;
 function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint; inline;
 begin
   SDL_SaveBMP:=SDL_SaveBMP_RW(surface, SDL_RWFromFile(file_, 'w'), 1);
+end;
+
+function SDL_BlitSurface(src: PSDL_Surface; const srcrect: PSDL_Rect;
+                        dst: PSDL_Surface; dstrect: PSDL_Rect): longint; inline;
+begin
+  SDL_BlitSurface:=SDL_UpperBlit(src, srcrect, dst, dstrect);
+end;
+
+function SDL_BlitScaled(src: PSDL_Surface; const srcrect: PSDL_Rect;
+                        dst: PSDL_Surface; dstrect: PSDL_Rect): longint; inline;
+begin
+  SDL_BlitScaled:=SDL_UpperBlitScaled(src, srcrect, dst, dstrect);
 end;
 
 //=====SDL_GAMECONTROLLER=====

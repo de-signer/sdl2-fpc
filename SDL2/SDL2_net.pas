@@ -43,11 +43,7 @@ type
 {$INLINE ON}
 {$PACKRECORDS C}
 
-{$IFDEF WINDOWS}
-  {$DEFINE lSDL:=cdecl; external 'SDL2_net.dll'}
-{$ELSE}
-  {$DEFINE lSDL:=cdecl; external 'libSDL2_net'}
-{$ENDIF}
+{$DEFINE lSDL:=cdecl; external 'SDL2_net'}
 
 {$IFDEF DARWIN}
   {$linkframework SDL2_net}
