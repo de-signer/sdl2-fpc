@@ -33,8 +33,6 @@ interface
 
 {$IFDEF DARWIN}
   {$linkframework SDL2}
-  {$linkframework Cocoa}
-  {$linkframework OpenGL}
 {$ENDIF}
 
 {$IFNDEF WINDOWS} //STDIO disabled on WIN by default (see SDL_config_windows.h)
@@ -45,17 +43,22 @@ interface
 
 type
   SDL_bool = longbool;
+
   PSint8 = ^Sint8;
   Sint8 = shortint;
   PUint8 = ^Uint8;
+
   PSint16 = ^Sint16;
   Sint16 = smallint;
   PUint16 = ^Uint16;
+
   Sint32 = longint;
   PUint32 = ^Uint32; //longword
+
   PUint64 = ^Uint64; //qword
   PSint64 = ^Sint64;
   Sint64 = int64;
+
   size_t = PtrUInt;
   psize_t = ^size_t;
   TSDL_iconv_t = pointer;
@@ -67,8 +70,7 @@ function SDL_realloc(mem: pointer; size: size_t): pointer; lSDL;
 procedure SDL_free(mem: pointer); lSDL;
 
 function SDL_getenv(name: pchar): pchar; lSDL;
-function SDL_setenv(const name,
-                    value: pchar;
+function SDL_setenv(const name, value: pchar;
                     overwrite: longint): longint; lSDL;
 
 type
@@ -158,6 +160,14 @@ function SDL_iconv(cd: TSDL_iconv_t; const inbuf: ppchar; inbytesleft: psize_t;
                    outbuf: ppchar; outbytesleft: psize_t): size_t; lSDL;
 function SDL_iconv_string(const tocode, fromcode,
                           inbuf: pchar; inbytesleft: size_t): pchar; lSDl;
+function SDL_iconv_utf8_locale(S: pchar): pchar; inline;
+function SDL_iconv_utf8_ucs2(S: pchar): pchar; inline;
+function SDL_iconv_utf8_ucs4(S: pchar): pchar; inline;
+
+
+//=====SDL_BITS=====
+
+function SDL_MostSignificantBitIndex32(x: Uint32): longint; inline;
 
 //=====SDL=====
 
@@ -199,6 +209,10 @@ type
 
 procedure SDL_VERSION(x: PSDL_Version); inline;
 
+function SDL_VERSIONNUM(X, Y, Z: longint): longint; inline;
+function SDL_COMPILEDVERSION: longint; inline;
+function SDL_VERSION_ATLEAST(X, Y, Z: longint): boolean; inline;
+
 procedure SDL_GetVersion(ver: PSDL_version); lSDL;
 function SDL_GetRevision: pchar; lSDL;
 function SDL_GetRevisionNumber: longint; lSDL;
@@ -239,10 +253,8 @@ type
     SDL_NUM_LOG_PRIORITIES);
 
   PSDL_LogOutputFunction=^TSDL_LogOutputFunction;
-  TSDL_LogOutputFunction=procedure(userdata: pointer;
-                                   category: longint;
-                                   priority: TSDL_LogPriority;
-                                   message: pchar); cdecl;
+  TSDL_LogOutputFunction=procedure(userdata: pointer; category: longint;
+                             priority: TSDL_LogPriority; message: pchar); cdecl;
 
 procedure SDL_LogSetAllPriority(priority: TSDL_LogPriority); lSDL;
 procedure SDL_LogSetPriority(category: longint;
@@ -256,8 +268,7 @@ procedure SDL_LogInfo(category: longint; fmt: pchar); lSDL; varargs;
 procedure SDL_LogWarn(category: longint; fmt: pchar); lSDL; varargs;
 procedure SDL_LogError(category: longint; fmt: pchar); lSDL; varargs;
 procedure SDL_LogCritical(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogMessage(category: longint;
-                         priority: TSDL_LogPriority;
+procedure SDL_LogMessage(category: longint; priority: TSDL_LogPriority;
                          fmt: pchar); lSDL; varargs;
 procedure SDL_LogGetOutputFunction(callback: PSDL_LogOutputFunction;
                                    userdata: ppointer); lSDL;
@@ -301,17 +312,15 @@ type
     SDL_HINT_OVERRIDE);
 
   TSDL_HintCallback=procedure(userdata: pointer;
-                                name, oldValue, newValue: pchar); cdecl;
+                              name, oldValue, newValue: pchar); cdecl;
 
 function SDL_SetHintWithPriority(name, value: pchar;
                                  priority: TSDL_HintPriority): SDL_bool; lSDL;
 function SDL_SetHint(name, value: pchar): SDL_bool; lSDL;
 function SDL_GetHint(name: pchar): pchar; lSDL;
-procedure SDL_AddHintCallback(name: pchar;
-                              callback: TSDL_HintCallback;
+procedure SDL_AddHintCallback(name: pchar; callback: TSDL_HintCallback;
                               userdata: pointer); lSDL;
-procedure SDL_DelHintCallback(name: pchar;
-                              callback: TSDL_HintCallback;
+procedure SDL_DelHintCallback(name: pchar; callback: TSDL_HintCallback;
                               userdata: pointer); lSDL;
 procedure SDL_ClearHints; lSDL;
 
@@ -333,14 +342,14 @@ function SDL_GetSystemRAM: longint; lSDL;
 
 //=====SDL_CLIPBOARD=====
 
-function SDL_SetClipboardText(text: pchar): longint; lSDL;
+function SDL_SetClipboardText(const text: pchar): longint; lSDL;
 function SDL_GetClipboardText: pchar; lSDL;
 function SDL_HasClipboardText: SDL_bool; lSDL;
 
 //=====SDL_LOADSO=====
 
-function SDL_LoadObject(sofile: pchar): pointer; lSDL;
-function SDL_LoadFunction(handle: pointer; name: pchar): pointer; lSDL;
+function SDL_LoadObject(const sofile: pchar): pointer; lSDL;
+function SDL_LoadFunction(handle: pointer; const name: pchar): pointer; lSDL;
 procedure SDL_UnloadObject(handle: pointer); lSDL;
 
 //=====SDL_PLATFORM=====
@@ -357,7 +366,7 @@ type
     SDL_POWERSTATE_CHARGING,
     SDL_POWERSTATE_CHARGED);
 
-function SDL_GetPowerInfo(secs: plongint; pct: plongint): TSDL_PowerState; lSDL;
+function SDL_GetPowerInfo(secs, pct: plongint): TSDL_PowerState; lSDL;
 
 //=====SDL_TIMER=====
 
@@ -379,7 +388,7 @@ function SDL_RemoveTimer(id: TSDL_TimerID): SDL_bool; lSDL;
 
 const
   SDL_MUTEX_TIMEDOUT=1;
-  SDL_MUTEX_MAXWAIT=high(longword);
+  SDL_MUTEX_MAXWAIT=0;
 
 type
   PSDL_Mutex=pointer;
@@ -426,8 +435,7 @@ type
   TSDL_ThreadFunction=function(data: pointer): longint; cdecl;
 
 function SDL_CreateThread(fn: TSDL_ThreadFunction;
-                          name: pchar;
-                          data: pointer): PSDL_Thread; lSDL;
+                          name: pchar; data: pointer): PSDL_Thread; lSDL;
 function SDL_GetThreadName(thread: PSDL_Thread): pchar; lSDL;
 function SDL_ThreadID: TSDL_threadID; lSDL;
 function SDL_GetThreadID(thread: PSDL_Thread): TSDL_threadID; lSDL;
@@ -437,8 +445,7 @@ procedure SDL_DetachThread(thread: PSDL_Thread); lSDL;
 
 function SDL_TLSCreate: TSDL_TLSID; lSDL;
 function SDL_TLSGet(id: TSDL_TLSID): pointer; lSDL;
-function SDL_TLSSet(id: TSDL_TLSID;
-                    const value: pointer;
+function SDL_TLSSet(id: TSDL_TLSID; const value: pointer;
                     destructor_: pointer): longint; lSDL;
 
 //=====SDL_RWOPS=====
@@ -456,32 +463,20 @@ const
   RW_SEEK_END=2;
 
 type
-  {$DEFINE REC_1:=0}
-  {$DEFINE REC_2:=1}
-  {$DEFINE REC_3:=2}
-
   PSDL_RWops=^TSDL_RWops;
   TSDL_RWops=record
     size: function(context: PSDL_RWops): Sint64; cdecl;
-    seek: function(context: PSDL_RWops;
-                   offset: Sint64;
+    seek: function(context: PSDL_RWops; offset: Sint64;
                    whence: longint): Sint64; cdecl;
-    read: function(context: PSDL_RWops;
-                   ptr: pointer;
-                   size,
-                   maxnum: size_t): size_t; cdecl;
-    write: function(context: PSDL_RWops;
-                    const ptr: pointer;
-                    size,
-                    num: size_t): size_t; cdecl;
+    read: function(context: PSDL_RWops; ptr: pointer;
+                   size, maxnum: size_t): size_t; cdecl;
+    write: function(context: PSDL_RWops; const ptr: pointer;
+                    size, num: size_t): size_t; cdecl;
     close: function(context: PSDL_RWops): longint; cdecl;
     type_: Uint32;
     hidden: record
       case Uint32 of
         {$IFDEF ANDROID}
-          {$DEFINE REC_1:=1}
-          {$DEFINE REC_2:=2}
-          {$DEFINE REC_3:=3}
         0: (androidio: record
               fileNameRef,
               inputStreamRef,
@@ -505,21 +500,21 @@ type
               end;
             end;);
         {$ENDIF}
-        {$IFDEF HAVE_STDIO_H} //stdio not available on Windows
-        REC_1: (stdio: record
-              autoclose: SDL_bool;
-              fp: pointer;
-            end;);
+        {$IFDEF HAVE_STDIO_H}
+        1: (stdio: record
+            autoclose: SDL_bool;
+            fp: pointer;
+          end;);
         {$ENDIF}
-        REC_2: (mem: record
-              base,
-              here,
-              stop: PUint8;
-            end;);
-        REC_3: (unknown: record
-              data1,
-              data2: pointer;
-            end;);
+        2: (mem: record
+            base,
+            here,
+            stop: PUint8;
+          end;);
+        3: (unknown: record
+            data1,
+            data2: pointer;
+          end;);
     end;
   end;
 
@@ -594,9 +589,8 @@ const
   SDL_AUDIO_ALLOW_FREQUENCY_CHANGE=$00000001;
   SDL_AUDIO_ALLOW_FORMAT_CHANGE   =$00000002;
   SDL_AUDIO_ALLOW_CHANNELS_CHANGE =$00000004;
-  SDL_AUDIO_ALLOW_ANY_CHANGE      =SDL_AUDIO_ALLOW_FREQUENCY_CHANGE or
-                                   SDL_AUDIO_ALLOW_FORMAT_CHANGE or
-                                   SDL_AUDIO_ALLOW_CHANNELS_CHANGE;
+  SDL_AUDIO_ALLOW_ANY_CHANGE=SDL_AUDIO_ALLOW_FREQUENCY_CHANGE or
+              SDL_AUDIO_ALLOW_FORMAT_CHANGE or SDL_AUDIO_ALLOW_CHANNELS_CHANGE;
 
   SDL_MIX_MAXVOLUME=128;
 
@@ -644,6 +638,20 @@ type
     SDL_AUDIO_PLAYING,
     SDL_AUDIO_PAUSED);
 
+const
+  SDL_AUDIO_MASK_BITSIZE=$FF;
+  SDL_AUDIO_MASK_DATATYPE=1 shl 8;
+  SDL_AUDIO_MASK_ENDIAN=1 shl 12;
+  SDL_AUDIO_MASK_SIGNED=1 shl 15;
+
+function SDL_AUDIO_BITSIZE(x: Uint16): Uint16; inline;
+function SDL_AUDIO_ISFLOAT(x: Uint16): boolean; inline;
+function SDL_AUDIO_ISBIGENDIAN(x: Uint16): boolean; inline;
+function SDL_AUDIO_ISSIGNED(x: Uint16): boolean; inline;
+function SDL_AUDIO_ISINT(x: Uint16): boolean; inline;
+function SDL_AUDIO_ISLITTLEENDIAN(x: Uint16): boolean; inline;
+function SDL_AUDIO_ISUNSIGNED(x: Uint16): boolean; inline;
+
 function SDL_GetNumAudioDrivers: longint; lSDL;
 function SDL_GetAudioDriver(index: longint): pchar; lSDL;
 function SDL_AudioInit(driver_name: pchar): longint; lSDL;
@@ -652,39 +660,26 @@ function SDL_GetCurrentAudioDriver: pchar; lSDL;
 function SDL_OpenAudio(desired, obtained: PSDL_AudioSpec): longint; lSDL;
 function SDL_GetNumAudioDevices(iscapture: longint): longint; lSDL;
 function SDL_GetAudioDeviceName(index, iscapture: longint): pchar; lSDL;
-function SDL_OpenAudioDevice(device: pchar;
-                            iscapture: longint;
-                            desired,
-                            obtained: PSDL_AudioSpec;
+function SDL_OpenAudioDevice(device: pchar; iscapture: longint;
+                            desired, obtained: PSDL_AudioSpec;
                             allowed_changes: longint): TSDL_AudioDeviceID; lSDL;
 function SDL_GetAudioStatus: TSDL_AudioStatus; lSDL;
 function SDL_GetAudioDeviceStatus(dev: TSDL_AudioDeviceID): TSDL_AudioStatus; lSDL;
 procedure SDL_PauseAudio(pause_on: longint); lSDL;
-procedure SDL_PauseAudioDevice(dev: TSDL_AudioDeviceID;
-                               pause_on: longint); lSDL;
-function SDL_LoadWAV_RW(src: PSDL_RWops;
-                        freesrc: longint;
-                        spec: PSDL_AudioSpec;
-                        audio_buf: ppbyte;
-                        audio_len: PUint32): PSDL_AudioSpec; lSDL;
+procedure SDL_PauseAudioDevice(dev: TSDL_AudioDeviceID; pause_on: longint); lSDL;
+function SDL_LoadWAV(file_: pchar; spec: PSDL_AudioSpec;
+                 audio_buf: ppbyte; audio_len: PUint32): PSDL_AudioSpec; inline;
+function SDL_LoadWAV_RW(src: PSDL_RWops; freesrc: longint; spec: PSDL_AudioSpec;
+                   audio_buf: ppbyte; audio_len: PUint32): PSDL_AudioSpec; lSDL;
 procedure SDL_FreeWAV(audio_buf: PUint8); lSDL;
-function SDL_BuildAudioCVT(cvt: PSDL_AudioCVT;
-                           src_format: TSDL_AudioFormat;
-                           src_channels: UInt8;
-                           src_rate: longint;
-                           dst_format: TSDL_AudioFormat;
-                           dst_channels: UInt8;
-                           dst_rate: longint): longint; lSDL;
+function SDL_BuildAudioCVT(cvt: PSDL_AudioCVT; src_format: TSDL_AudioFormat;
+           src_channels: UInt8; src_rate: longint; dst_format: TSDL_AudioFormat;
+           dst_channels: UInt8; dst_rate: longint): longint; lSDL;
 function SDL_ConvertAudio(cvt: PSDL_AudioCVT): longint; lSDL;
-procedure SDL_MixAudio(dst: PUint8;
-                       const src: PUint8;
-                       len: Uint32;
-                       volume: longint); lSDL;
-procedure SDL_MixAudioFormat(dst: PUint8;
-                             const src: PUint8;
-                             format: TSDL_AudioFormat;
-                             len: Uint32;
-                             volume: longint); lSDL;
+procedure SDL_MixAudio(dst: PUint8; const src: PUint8;
+                       len: Uint32; volume: longint); lSDL;
+procedure SDL_MixAudioFormat(dst: PUint8; const src: PUint8;
+                  format: TSDL_AudioFormat; len: Uint32; volume: longint); lSDL;
 procedure SDL_LockAudio; lSDL;
 procedure SDL_LockAudioDevice(dev: TSDL_AudioDeviceID); lSDL;
 procedure SDL_UnlockAudio; lSDL;
@@ -743,36 +738,36 @@ const
   SDL_PACKEDLAYOUT_2101010=7;
   SDL_PACKEDLAYOUT_1010102=8;
 
-  SDL_PIXELFORMAT_UNKNOWN    =0;
-  SDL_PIXELFORMAT_INDEX1LSB  =$11100100;
-  SDL_PIXELFORMAT_INDEX1MSB  =$11200100;
-  SDL_PIXELFORMAT_INDEX4LSB  =$12100400;
-  SDL_PIXELFORMAT_INDEX4MSB  =$12200400;
-  SDL_PIXELFORMAT_INDEX8     =$13000801;
-  SDL_PIXELFORMAT_RGB332     =$14110801;
-  SDL_PIXELFORMAT_RGB444     =$15120C02;
-  SDL_PIXELFORMAT_RGB555     =$15130F02;
-  SDL_PIXELFORMAT_BGR555     =$15530F02;
-  SDL_PIXELFORMAT_ARGB4444   =$15321002;
-  SDL_PIXELFORMAT_RGBA4444   =$15421002;
-  SDL_PIXELFORMAT_ABGR4444   =$15721002;
-  SDL_PIXELFORMAT_BGRA4444   =$15821002;
-  SDL_PIXELFORMAT_ARGB1555   =$15331002;
-  SDL_PIXELFORMAT_RGBA5551   =$15441002;
-  SDL_PIXELFORMAT_ABGR1555   =$15731002;
-  SDL_PIXELFORMAT_BGRA5551   =$15841002;
-  SDL_PIXELFORMAT_RGB565     =$15151002;
-  SDL_PIXELFORMAT_BGR565     =$15551002;
-  SDL_PIXELFORMAT_RGB24      =$17101803;
-  SDL_PIXELFORMAT_BGR24      =$17401803;
-  SDL_PIXELFORMAT_RGB888     =$16161804;
-  SDL_PIXELFORMAT_RGBX8888   =$16261804;
-  SDL_PIXELFORMAT_BGR888     =$16561804;
-  SDL_PIXELFORMAT_BGRX8888   =$16661804;
-  SDL_PIXELFORMAT_ARGB8888   =$16362004;
-  SDL_PIXELFORMAT_RGBA8888   =$16462004;
-  SDL_PIXELFORMAT_ABGR8888   =$16762004;
-  SDL_PIXELFORMAT_BGRA8888   =$16862004;
+  SDL_PIXELFORMAT_UNKNOWN  =0;
+  SDL_PIXELFORMAT_INDEX1LSB=$11100100;
+  SDL_PIXELFORMAT_INDEX1MSB=$11200100;
+  SDL_PIXELFORMAT_INDEX4LSB=$12100400;
+  SDL_PIXELFORMAT_INDEX4MSB=$12200400;
+  SDL_PIXELFORMAT_INDEX8   =$13000801;
+  SDL_PIXELFORMAT_RGB332   =$14110801;
+  SDL_PIXELFORMAT_RGB444   =$15120C02;
+  SDL_PIXELFORMAT_RGB555   =$15130F02;
+  SDL_PIXELFORMAT_BGR555   =$15530F02;
+  SDL_PIXELFORMAT_ARGB4444 =$15321002;
+  SDL_PIXELFORMAT_RGBA4444 =$15421002;
+  SDL_PIXELFORMAT_ABGR4444 =$15721002;
+  SDL_PIXELFORMAT_BGRA4444 =$15821002;
+  SDL_PIXELFORMAT_ARGB1555 =$15331002;
+  SDL_PIXELFORMAT_RGBA5551 =$15441002;
+  SDL_PIXELFORMAT_ABGR1555 =$15731002;
+  SDL_PIXELFORMAT_BGRA5551 =$15841002;
+  SDL_PIXELFORMAT_RGB565   =$15151002;
+  SDL_PIXELFORMAT_BGR565   =$15551002;
+  SDL_PIXELFORMAT_RGB24    =$17101803;
+  SDL_PIXELFORMAT_BGR24    =$17401803;
+  SDL_PIXELFORMAT_RGB888   =$16161804;
+  SDL_PIXELFORMAT_RGBX8888 =$16261804;
+  SDL_PIXELFORMAT_BGR888   =$16561804;
+  SDL_PIXELFORMAT_BGRX8888 =$16661804;
+  SDL_PIXELFORMAT_ARGB8888 =$16362004;
+  SDL_PIXELFORMAT_RGBA8888 =$16462004;
+  SDL_PIXELFORMAT_ABGR8888 =$16762004;
+  SDL_PIXELFORMAT_BGRA8888 =$16862004;
   SDL_PIXELFORMAT_ARGB2101010=$16372004;
 
   SDL_PIXELFORMAT_YV12=$32315659;
@@ -821,6 +816,16 @@ type
     next: PSDL_PixelFormat;
   end;
 
+function SDL_PIXELFLAG(X: Uint32): Uint32; inline;
+function SDL_PIXELTYPE(X: Uint32): Uint32; inline;
+function SDL_PIXELORDER(X: Uint32): Uint32; inline;
+function SDL_PIXELLAYOUT(X: Uint32): Uint32; inline;
+function SDL_BITSPERPIXEL(X: Uint32): Uint32; inline;
+function SDL_BYTESPERPIXEL(X: Uint32): Uint32; inline;
+function SDL_ISPIXELFORMAT_INDEXED(format: Uint32): boolean; inline;
+function SDL_ISPIXELFORMAT_ALPHA(format: Uint32): boolean; inline;
+function SDL_ISPIXELFORMAT_FOURCC(format: Uint32): boolean; inline;
+
 function SDL_GetPixelFormatName(format: Uint32): pchar; lSDL;
 function SDL_PixelFormatEnumToMasks(format: Uint32; bpp: plongint;
                            Rmask, Gmask, Bmask, Amask: PUint32): SDL_bool; lSDL;
@@ -865,10 +870,8 @@ function SDL_HasIntersection(const a, b: PSDL_Rect): SDL_bool; lSDL;
 function SDL_IntersectRect(const a, b: PSDL_Rect;
                            result: PSDL_Rect): SDL_bool; lSDL;
 procedure SDL_UnionRect(const a, b: PSDL_Rect; result: PSDL_Rect); lSDL;
-function SDL_EnclosePoints(const points: PSDL_Point;
-                           count: longint;
-                           const clip: PSDL_Rect;
-                           result: PSDL_Rect): SDL_bool; lSDL;
+function SDL_EnclosePoints(const points: PSDL_Point; count: longint;
+                      const clip: PSDL_Rect; result: PSDL_Rect): SDL_bool; lSDL;
 function SDL_IntersectRectAndLine(const rect: PSDL_Rect;
                                   x1, y1, x2, y2: plongint): SDL_bool; lSDL;
 
@@ -907,23 +910,12 @@ type
   TSDL_Blit=function(src: PSDL_Surface; srcrect: PSDL_Rect; dst: PSDL_Surface;
                      dstrect: PSDL_Rect): longint;
 
-function SDL_CreateRGBSurface(flags: Uint32;
-                              width,
-                              height,
-                              depth: longint;
-                              Rmask,
-                              Gmask,
-                              Bmask,
-                              Amask: Uint32): PSDL_Surface; lSDL;
-function SDL_CreateRGBSurfaceFrom(pixels: pointer;
-                                  width,
-                                  height,
-                                  depth,
-                                  pitch: longint;
-                                  Rmask,
-                                  Gmask,
-                                  Bmask,
-                                  Amask: Uint32): PSDL_Surface; lSDL;
+function SDL_MUSTLOCK(S: PSDL_Surface): boolean; inline;
+
+function SDL_CreateRGBSurface(flags: Uint32;width, height, depth: longint;
+                        Rmask, Gmask, Bmask, Amask: Uint32): PSDL_Surface; lSDL;
+function SDL_CreateRGBSurfaceFrom(pixels: pointer; width, height, depth,
+        pitch: longint; Rmask, Gmask, Bmask, Amask: Uint32): PSDL_Surface; lSDL;
 procedure SDL_FreeSurface(surface: PSDL_Surface); lSDL;
 
 function SDL_SetSurfacePalette(surface: PSDL_Surface;
@@ -1236,8 +1228,7 @@ function SDL_GetNumRenderDrivers: longint; lSDL;
 function SDL_GetRenderDriverInfo(index: longint;
                                  info: PSDL_RendererInfo): longint; lSDL;
 function SDL_CreateWindowAndRenderer(width, height: longint;
-                                     window_flags: Uint32;
-                                     window: PPSDL_Window;
+                                     window_flags: Uint32; window: PPSDL_Window;
                                      renderer: PPSDL_Renderer): longint; lSDL;
 function SDL_CreateRenderer(window: PSDL_Window;
                             index: longint; flags: Uint32): PSDL_Renderer; lSDL;
@@ -1265,19 +1256,14 @@ function SDL_SetTextureBlendMode(texture: PSDL_Texture;
                                  blendMode: longword): longint; lSDL;
 function SDL_GetTextureBlendMode(texture: PSDL_Texture;
                                  blendMode: plongword): longint; lSDL;
-function SDL_UpdateTexture(texture: PSDL_Texture;
-                           const rect: PSDL_Rect;
-                           const pixels: pointer;
-                           pitch: longint): longint; lSDL;
-function SDL_UpdateYUVTexture(texture: PSDL_Texture;
-                          const rect: PSDL_Rect;
+function SDL_UpdateTexture(texture: PSDL_Texture; const rect: PSDL_Rect;
+                          const pixels: pointer; pitch: longint): longint; lSDL;
+function SDL_UpdateYUVTexture(texture: PSDL_Texture; const rect: PSDL_Rect;
                           const Yplane: PUint8; Ypitch: longint;
                           const Uplane: PUint8; Upitch: longint;
                           const Vplane: PUint8; Vpitch: longint): longint; lSDL;
-function SDL_LockTexture(texture: PSDL_Texture;
-                         const rect: PSDL_Rect;
-                         pixels: ppointer;
-                         pitch: plongint): longint; lSDL;
+function SDL_LockTexture(texture: PSDL_Texture; const rect: PSDL_Rect;
+                         pixels: ppointer; pitch: plongint): longint; lSDL;
 procedure SDL_UnlockTexture(texture: PSDL_Texture); lSDL;
 function SDL_RenderTargetSupported(renderer: PSDL_Renderer): SDL_bool; lSDL;
 function SDL_SetRenderTarget(renderer: PSDL_Renderer;
@@ -1310,23 +1296,19 @@ function SDL_GetRenderDrawBlendMode(renderer: PSDL_Renderer;
 function SDL_RenderClear(renderer: PSDL_Renderer): longint; lSDL;
 function SDL_RenderDrawPoint(renderer: PSDL_Renderer;
                              x, y: longint): longint; lSDL;
-function SDL_RenderDrawPoints(renderer: PSDL_Renderer;
-                              const points: PSDL_Point;
+function SDL_RenderDrawPoints(renderer: PSDL_Renderer; const points: PSDL_Point;
                               count: longint): longint; lSDL;
 function SDL_RenderDrawLine(renderer: PSDL_Renderer;
                             x1, y1, x2, y2: longint): longint; lSDL;
-function SDL_RenderDrawLines(renderer: PSDL_Renderer;
-                             const points: PSDL_Point;
+function SDL_RenderDrawLines(renderer: PSDL_Renderer; const points: PSDL_Point;
                              count: longint): longint; lSDL;
 function SDL_RenderDrawRect(renderer: PSDL_Renderer;
                             const rect: PSDL_Rect): longint; lSDL;
-function SDL_RenderDrawRects(renderer: PSDL_Renderer;
-                             const rects: PSDL_Rect;
+function SDL_RenderDrawRects(renderer: PSDL_Renderer; const rects: PSDL_Rect;
                              count: longint): longint; lSDL;
 function SDL_RenderFillRect(renderer: PSDL_Renderer;
                             const rect: PSDL_Rect): longint; lSDL;
-function SDL_RenderFillRects(renderer: PSDL_Renderer;
-                             const rects: PSDL_Rect;
+function SDL_RenderFillRects(renderer: PSDL_Renderer; const rects: PSDL_Rect;
                              count: longint): longint; lSDL;
 
 function SDL_RenderCopy(renderer: PSDL_Renderer;
@@ -2021,12 +2003,6 @@ procedure SDL_WarpMouseInWindow(window: PSDL_Window; x, y: longint); lSDL;
 function SDL_SetRelativeMouseMode(enabled: SDL_bool): longint; lSDL;
 function SDL_GetRelativeMouseMode: SDL_bool; lSDL;
 
-{ data | mask | resulting pixel
-  —————————————————————————————
-  0    | 1    | White
-  1    | 1    | Black
-  0    | 0    | Transparent
-  1    | 0    | Inverted color if possible, black if not }
 function SDL_CreateCursor(const data , mask: PUint8;
                           w, h, hot_x, hot_y: longint): PSDL_Cursor; lSDL;
 function SDL_CreateColorCursor(surface: PSDL_Surface;
@@ -2139,19 +2115,10 @@ type
     end;
   end;
 
-//https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
 function SDL_GameControllerAddMappingsFromRW(rw: PSDL_RWops;
                                              freerw: longint): longint; lSDL;
 function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint; inline;
 
-{
-This string shows an example of a valid mapping for a controller
-  '341a3608000000000000504944564944,Afterglow PS3 Controller,
-  a:b1,b:b2,y:b3,x:b0,start:b9,guide:b12,back:b8,dpup:h0.1,dpleft:h0.8,
-  dpdown:h0.4,dpright:h0.2,leftshoulder:b4,rightshoulder:b5,leftstick:b10,
-  rightstick:b11,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,
-  righttrigger:b7'
-}
 function SDL_GameControllerAddMapping(mapping: pchar): longint; lSDL;
 function SDL_GameControllerMappingForGUID(guid: TSDL_JoystickGUID): pchar; lSDL;
 function SDL_GameControllerMapping(gamecontroller: PSDL_GameController): pchar; lSDL;
@@ -2332,11 +2299,9 @@ function SDL_HapticEffectSupported(haptic: PSDL_Haptic;
                                    effect: PSDL_HapticEffect): longint; lSDL;
 function SDL_HapticNewEffect(haptic: PSDL_Haptic;
                              effect: PSDL_HapticEffect): longint; lSDL;
-function SDL_HapticUpdateEffect(haptic: PSDL_Haptic;
-                                effect: longint;
+function SDL_HapticUpdateEffect(haptic: PSDL_Haptic; effect: longint;
                                 data: PSDL_HapticEffect): longint; lSDL;
-function SDL_HapticRunEffect(haptic: PSDL_Haptic;
-                             effect: longint;
+function SDL_HapticRunEffect(haptic: PSDL_Haptic; effect: longint;
                              iterations: Uint32): longint; lSDL;
 function SDL_HapticStopEffect(haptic: PSDL_Haptic;
                               effect: longint): longint; lSDL;
@@ -2352,8 +2317,7 @@ function SDL_HapticStopAll(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticRumbleSupported(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticRumbleInit(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticRumblePlay(haptic: PSDL_Haptic;
-                              strength: single;
-                              length: Uint32): longint; lSDL;
+                              strength: single; length: Uint32): longint; lSDL;
 function SDL_HapticRumbleStop(haptic: PSDL_Haptic): longint; lSDL;
 
 //=====SDL_TOUCH=====
@@ -2517,10 +2481,8 @@ type
     windowID,
     which,
     state: Uint32;
-    x,
-    y,
-    xrel,
-    yrel: Sint32;
+    x, y,
+    xrel, yrel: Sint32;
   end;
 
   TSDL_MouseButtonEvent=record
@@ -2532,8 +2494,7 @@ type
     state,
     clicks,
     padding1: UInt8;
-    x,
-    y: Sint32;
+    x, y: Sint32;
   end;
 
   TSDL_MouseWheelEvent=record
@@ -2541,8 +2502,7 @@ type
     timestamp,
     windowID,
     which: Uint32;
-    x,
-    y: Sint32;
+    x, y: Sint32;
   end;
 
   TSDL_JoyAxisEvent=record
@@ -2565,8 +2525,7 @@ type
     padding1,
     padding2,
     padding3: UInt8;
-    xrel,
-    yrel: Sint16;
+    xrel, yrel: Sint16;
   end;
 
   TSDL_JoyHatEvent=record
@@ -2628,10 +2587,8 @@ type
     timestamp: Uint32;
     touchId: TSDL_TouchID;
     fingerId: TSDL_FingerID;
-    x,
-    y,
-    dx,
-    dy,
+    x, y,
+    dx, dy,
     pressure: single;
   end;
 
@@ -2641,8 +2598,7 @@ type
     touchId: TSDL_TouchID;
     dTheta,
     dDist,
-    x,
-    y: single;
+    x, y: single;
     numFingers,
     padding: UInt16;
   end;
@@ -2654,8 +2610,7 @@ type
     gestureId: TSDL_GestureID;
     numFingers: Uint32;
     error,
-    x,
-    y: single;
+    x, y: single;
   end;
 
   TSDL_DropEvent=record
@@ -2735,14 +2690,14 @@ type
 
   PSDL_EventFilter=^TSDL_EventFilter;
   TSDL_EventFilter=function(userdata: pointer;
-                              event: PSDL_Event): longint; cdecl;
+                            event: PSDL_Event): longint; cdecl;
+
+function SDL_QuitRequested: boolean; inline;
 
 procedure SDL_PumpEvents; lSDL;
-function SDL_PeepEvents(events: PSDL_Event;
-                        numevents: longint;
+function SDL_PeepEvents(events: PSDL_Event; numevents: longint;
                         action: TSDL_eventaction;
-                        minType,
-                        maxType: Uint32): longint; lSDL;
+                        minType, maxType: Uint32): longint; lSDL;
 function SDL_HasEvent(type_: Uint32): SDL_bool; lSDL;
 function SDL_HasEvents(minType, maxType: Uint32): SDL_bool; lSDL;
 procedure SDL_FlushEvent(type_: Uint32); lSDL;
@@ -2793,6 +2748,35 @@ function SDL_AndroidGetExternalStoragePath: pchar; lSDL;
 
 implementation
 
+//=====SDL_STDINC=====
+
+function SDL_iconv_utf8_locale(S: pchar): pchar; inline;
+begin
+  SDL_iconv_utf8_locale:=SDL_iconv_string('', 'UTF-8', S, SDL_strlen(S)+1);
+end;
+
+function SDL_iconv_utf8_ucs2(S: pchar): pchar; inline;
+begin
+  SDL_iconv_utf8_ucs2:=SDL_iconv_string('UCS-2-INTERNAL', 'UTF-8',
+    S, SDL_strlen(S)+1);
+end;
+
+function SDL_iconv_utf8_ucs4(S: pchar): pchar; inline;
+begin
+  SDL_iconv_utf8_ucs4:=SDL_iconv_string('UCS-4-INTERNAL', 'UTF-8',
+    S, SDL_strlen(S)+1);
+end;
+
+//=====SDL_BITS=====
+
+function SDL_MostSignificantBitIndex32(x: Uint32): longint; inline;
+begin
+  if x=0 then
+    exit(-1)
+  else
+    SDL_MostSignificantBitIndex32:=BsrDword(x);
+end;
+
 //=====SDL_VERSION=====
 
 procedure SDL_VERSION(x: PSDL_Version); inline;
@@ -2800,6 +2784,22 @@ begin
   x^.major:=SDL_MAJOR_VERSION;
   x^.minor:=SDL_MINOR_VERSION;
   x^.patch:=SDL_PATCHLEVEL;
+end;
+
+function SDL_VERSIONNUM(X, Y, Z: longint): longint; inline;
+begin
+  SDL_VERSIONNUM:=X*1000+Y*100+Z;
+end;
+
+function SDL_COMPILEDVERSION: longint; inline;
+begin
+  SDL_COMPILEDVERSION:=SDL_VERSIONNUM(SDL_MAJOR_VERSION,
+    SDL_MINOR_VERSION, SDL_PATCHLEVEL);
+end;
+
+function SDL_VERSION_ATLEAST(X, Y, Z: longint): boolean; inline;
+begin
+  SDL_VERSION_ATLEAST:=SDL_COMPILEDVERSION>=SDL_VERSIONNUM(X, Y, Z);
 end;
 
 //=====SDL_TIMER=====
@@ -2856,19 +2856,134 @@ begin
   SDL_RWclose:=ctx^.close(ctx);
 end;
 
+//=====SDL_AUDIO=====
+
+function SDL_AUDIO_BITSIZE(x: Uint16): Uint16; inline;
+begin
+  SDL_AUDIO_BITSIZE:=x and SDL_AUDIO_MASK_BITSIZE;
+end;
+
+function SDL_AUDIO_ISFLOAT(x: Uint16): boolean; inline;
+begin
+  SDL_AUDIO_ISFLOAT:=(x and SDL_AUDIO_MASK_DATATYPE)>0;
+end;
+
+function SDL_AUDIO_ISBIGENDIAN(x: Uint16): boolean; inline;
+begin
+  SDL_AUDIO_ISBIGENDIAN:=(x and SDL_AUDIO_MASK_ENDIAN)>0;
+end;
+
+function SDL_AUDIO_ISSIGNED(x: Uint16): boolean; inline;
+begin
+  SDL_AUDIO_ISSIGNED:=(x and SDL_AUDIO_MASK_SIGNED)>0;
+end;
+
+function SDL_AUDIO_ISINT(x: Uint16): boolean; inline;
+begin
+  SDL_AUDIO_ISINT:=not SDL_AUDIO_ISFLOAT(x);
+end;
+
+function SDL_AUDIO_ISLITTLEENDIAN(x: Uint16): boolean; inline;
+begin
+  SDL_AUDIO_ISLITTLEENDIAN:=not SDL_AUDIO_ISBIGENDIAN(x);
+end;
+
+function SDL_AUDIO_ISUNSIGNED(x: Uint16): boolean; inline;
+begin
+  SDL_AUDIO_ISUNSIGNED:=not SDL_AUDIO_ISSIGNED(x);
+end;
+
+function SDL_LoadWAV(file_: pchar;
+                     spec: PSDL_AudioSpec;
+                     audio_buf: ppbyte;
+                     audio_len: PUint32): PSDL_AudioSpec; inline;
+begin
+  SDL_LoadWAV:=SDL_LoadWAV_RW(SDL_RWFromFile(file_, 'r'), 1,
+                              spec, audio_buf, audio_len);
+end;
+//=====SDL_PIXELS=====
+
+function SDL_PIXELFLAG(X: Uint32): Uint32; inline;
+begin
+  SDL_PIXELFLAG:=(X shr 28) and $0F;
+end;
+
+function SDL_PIXELTYPE(X: Uint32): Uint32; inline;
+begin
+  SDL_PIXELTYPE:=(X shr 24) and $0F;
+end;
+
+function SDL_PIXELORDER(X: Uint32): Uint32; inline;
+begin
+  SDL_PIXELORDER:=(X shr 20) and $0F;
+end;
+
+function SDL_PIXELLAYOUT(X: Uint32): Uint32; inline;
+begin
+  SDL_PIXELLAYOUT:=(X shr 16) and $0F;
+end;
+
+function SDL_BITSPERPIXEL(X: Uint32): Uint32; inline;
+begin
+  SDL_BITSPERPIXEL:=(X shr 8) and $FF;
+end;
+
+function SDL_BYTESPERPIXEL(X: Uint32): Uint32; inline;
+begin
+  if SDL_ISPIXELFORMAT_FOURCC(X) then
+    begin
+      if (X=SDL_PIXELFORMAT_YUY2) or
+         (X=SDL_PIXELFORMAT_UYVY) or
+         (X=SDL_PIXELFORMAT_YVYU) then
+        SDL_BYTESPERPIXEL:=2
+      else
+        SDL_BYTESPERPIXEL:=1;
+    end
+  else
+    SDL_BYTESPERPIXEL:=(X shr 0) and $FF;
+end;
+
+function SDL_ISPIXELFORMAT_INDEXED(format: Uint32): boolean; inline;
+begin
+  SDL_ISPIXELFORMAT_INDEXED:=(not SDL_ISPIXELFORMAT_FOURCC(format)) and
+    ((SDL_PIXELTYPE(format)=SDL_PIXELTYPE_INDEX1) or
+     (SDL_PIXELTYPE(format)=SDL_PIXELTYPE_INDEX4) or
+     (SDL_PIXELTYPE(format)=SDL_PIXELTYPE_INDEX8));
+end;
+
+function SDL_ISPIXELFORMAT_ALPHA(format: Uint32): boolean; inline;
+begin
+  SDL_ISPIXELFORMAT_ALPHA:=(not SDL_ISPIXELFORMAT_FOURCC(format)) and
+    ((SDL_PIXELORDER(format)=SDL_PACKEDORDER_ARGB) or
+     (SDL_PIXELORDER(format)=SDL_PACKEDORDER_RGBA) or
+     (SDL_PIXELORDER(format)=SDL_PACKEDORDER_ABGR) or
+     (SDL_PIXELORDER(format)=SDL_PACKEDORDER_BGRA));
+end;
+
+function SDL_ISPIXELFORMAT_FOURCC(format: Uint32): boolean; inline;
+begin
+  SDL_ISPIXELFORMAT_FOURCC:=(format and SDL_PIXELFLAG(format))<>1;
+end;
+
 //=====SDL_RECT=====
 
 function SDL_RectEmpty(const x: PSDL_Rect): SDL_bool; inline;
 begin
-  SDL_RectEmpty:=(x^.w<=0) or (x^.h<=0);
+  SDL_RectEmpty:=(x=NIL) or (x^.w<=0) or (x^.h<=0);
 end;
 
 function SDL_RectEquals(const a, b: PSDL_Rect): SDL_bool; inline;
 begin
-  SDL_RectEquals:=(a^.x=b^.x) and (a^.y=b^.y) and (a^.w=b^.w) and (a^.h=b^.h);
+  SDL_RectEquals:=(a<>NIL) and (b<>NIL) and
+                  (a^.x=b^.x) and (a^.y=b^.y) and (a^.w=b^.w) and (a^.h=b^.h);
 end;
 
 //=====SDL_SURFACE=====
+
+function SDL_MUSTLOCK(S: PSDL_Surface): boolean; inline;
+begin
+  SDL_MUSTLOCK:=(S^.flags and SDL_RLEACCEL)<>0;
+end;
 
 function SDL_LoadBMP(file_: pchar): PSDL_Surface; inline;
 begin
@@ -2901,6 +3016,13 @@ begin
 end;
 
 //=====SDL_EVENTS=====
+
+function SDL_QuitRequested: boolean; inline;
+begin
+  SDL_PumpEvents;
+  SDL_QuitRequested:=SDL_PeepEvents(NIL, 0,
+    SDL_PEEKEVENT, SDL_QUITEV, SDL_QUITEV)>0;
+end;
 
 function SDL_GetEventState(type_: Uint32): Uint8; inline;
 begin

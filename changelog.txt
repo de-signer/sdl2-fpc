@@ -1,5 +1,12 @@
 SDL2 headers for Free Pascal
 
+1.13 (18.05.14)
+  Critical fix in SDL_net definitions
+  SDLNet_SocketReady now returns boolean
+  Removed definitions in SDL_RWops record
+  New macros and functions
+  Other small fixes
+
 1.12 (16.05.14)
   [#1] Fixed issues with external names
   Removed platform-specific library names

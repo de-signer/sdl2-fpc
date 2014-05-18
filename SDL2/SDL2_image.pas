@@ -25,7 +25,6 @@ uses SDL2;
 {$IFDEF DARWIN}
   {$linkframework SDL2}
   {$linkframework SDL2_image}
-  {$linkframework Cocoa}
 {$ENDIF}
 
 const
@@ -44,8 +43,7 @@ function IMG_Linked_Version: PSDL_Version; lSDL;
 function IMG_Init(flags: longint): longint; lSDL;
 procedure IMG_Quit; lSDL;
 
-function IMG_LoadTyped_RW(src: PSDL_RWops;
-                          freesrc: longint;
+function IMG_LoadTyped_RW(src: PSDL_RWops; freesrc: longint;
                           const type_: pchar): PSDL_Surface; lSDL;
 function IMG_Load(const file_: pchar): PSDL_Surface; lSDL;
 function IMG_Load_RW(src: PSDL_RWops; freesrc: longint): PSDL_Surface; lSDL;
@@ -53,12 +51,9 @@ function IMG_Load_RW(src: PSDL_RWops; freesrc: longint): PSDL_Surface; lSDL;
 function IMG_LoadTexture(renderer: PSDL_Renderer;
                          const file_: pchar): PSDL_Texture; lSDL;
 function IMG_LoadTexture_RW(renderer: PSDL_Renderer;
-                            src: PSDL_RWops;
-                            freesrc: longint): PSDL_Texture; lSDL;
+                         src: PSDL_RWops; freesrc: longint): PSDL_Texture; lSDL;
 function IMG_LoadTextureTyped_RW(renderer: PSDL_Renderer;
-                                 src: PSDL_RWops;
-                                 freesrc: longint;
-                                 const type_: pchar): PSDL_Texture; lSDL;
+     src: PSDL_RWops; freesrc: longint; const type_: pchar): PSDL_Texture; lSDL;
 
 function IMG_isICO(src: PSDL_RWops): longint; lSDL;
 function IMG_isCUR(src: PSDL_RWops): longint; lSDL;
@@ -93,10 +88,8 @@ function IMG_LoadWEBP_RW(src: PSDL_RWops): PSDL_Surface; lSDL;
 
 function IMG_ReadXPMFromArray(xpm: ppchar): PSDL_Surface; lSDL;
 
-function IMG_SavePNG(surface: PSDL_Surface;
-                     const file_: pchar): longint; lSDL;
-function IMG_SavePNG_RW(surface: PSDL_Surface;
-                        dst: PSDL_RWops;
+function IMG_SavePNG(surface: PSDL_Surface; const file_: pchar): longint; lSDL;
+function IMG_SavePNG_RW(surface: PSDL_Surface; dst: PSDL_RWops;
                         freedst: longint): longint; lSDL;
 
 function IMG_SetError(const fmt: pchar): longint; cdecl;

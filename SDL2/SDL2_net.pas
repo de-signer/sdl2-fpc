@@ -17,23 +17,23 @@ interface
 
 {$IFDEF WITHOUT_SDL}
 type
-  PUint8 = ^Uint8;
-  PUint16 = ^Uint16;
-  PUint32 = ^Uint32;
+  PUint8=^Uint8;
+  PUint16=^Uint16;
+  PUint32=^Uint32;
 
-  PSDLNet_version = ^TSDLNet_version;
-  TSDLNet_version = record
+  PSDLNet_version=^TSDLNet_version;
+  TSDLNet_version=record
     major,
     minor,
     patch: Uint8;
   end;
 {$ELSE WITHOUT_SDL}
 
+uses SDL2;
+
 {$IFDEF DARWIN}
   {$linkframework SDL2}
 {$ENDIF}
-
-uses SDL2;
 
 type
   PSDLNet_version = ^TSDL_version;
@@ -61,7 +61,7 @@ function SDLNet_Init(flags: longint): longint; lSDL;
 procedure SDLNet_Quit; lSDL;
 
 type
-  PIPaddress =^TIPaddress;
+  PIPaddress=^TIPaddress;
   TIPaddress=record
     host: Uint32;
     port: Uint16;
@@ -73,8 +73,7 @@ const
   INADDR_LOOPBACK =$7f000001;
   INADDR_BROADCAST=$FFFFFFFF;
 
-function SDLNet_ResolveHost(address: PIPaddress;
-                            const host: pchar;
+function SDLNet_ResolveHost(address: PIPaddress; const host: pchar;
                             port: Uint16): longint; lSDL;
 function SDLNet_ResolveIP(const ip: PIPaddress): pchar; lSDL;
 function SDLNet_GetLocalAddresses(addresses: PIPaddress;
@@ -86,13 +85,15 @@ type
 function SDLNet_TCP_Open(ip: PIPaddress): PTCPsocket; lSDL;
 function SDLNet_TCP_Accept(server: PTCPsocket): PTCPsocket; lSDL;
 function SDLNet_TCP_GetPeerAddress(sock: PTCPsocket): PIPaddress; lSDL;
-function SDLNet_TCP_Send(sock: PTCPsocket;
-                         const data: pointer;
+function SDLNet_TCP_Send(sock: PTCPsocket; const data: pointer;
                          len: longint): longint; lSDL;
-function SDLNet_TCP_Recv(sock: PTCPsocket;
-                         data: pointer;
+function SDLNet_TCP_Recv(sock: PTCPsocket; data: pointer;
                          len: longint): longint; lSDL;
 procedure SDLNet_TCP_Close(sock: PTCPsocket); lSDL;
+
+const
+  SDLNET_MAX_UDPCHANNELS=32;
+  SDLNET_MAX_UDPADDRESSES=4;
 
 type
   PUDPsocket=pointer;
@@ -102,8 +103,8 @@ type
   TUDPpacket=record
     channel: longint;
     data: PUint8;
-    len: longint;
-    maxlen: longint;
+    len,
+    maxlen,
     status: longint;
     address: TIPaddress;
   end;
@@ -118,20 +119,16 @@ procedure SDLNet_FreePacketV(packetV: PPUDPpacket); lSDl;
 
 function SDLNet_UDP_Open(port: Uint16): PUDPsocket; lSDL;
 procedure SDLNet_UDP_SetPacketLoss(sock: PUDPsocket; percent: longint); lSDL;
-function SDLNet_UDP_Bind(sock: PUDPsocket;
-                         channel: longint;
+function SDLNet_UDP_Bind(sock: PUDPsocket; channel: longint;
                          const address: PIPaddress): longint; lSDL;
 procedure SDLNet_UDP_Unbind(sock: PUDPsocket; channel: longint); lSDL;
 function SDLNet_UDP_GetPeerAddress(sock: PUDPsocket;
                                    channel: longint): PIPaddress; lSDL;
-function SDLNet_UDP_SendV(sock: PUDPsocket;
-                          packets: PPUDPpacket;
+function SDLNet_UDP_SendV(sock: PUDPsocket; packets: PPUDPpacket;
                           npackets: longint): longint; lSDL;
-function SDLNet_UDP_Send(sock: PUDPsocket;
-                         channel: longint;
+function SDLNet_UDP_Send(sock: PUDPsocket; channel: longint;
                          packet: PUDPpacket): longint; lSDL;
-function SDLNet_UDP_RecvV(sock: PUDPsocket;
-                          packets: PPUDPpacket): longint; lSDL;
+function SDLNet_UDP_RecvV(sock: PUDPsocket; packets: PPUDPpacket): longint; lSDL;
 function SDLNet_UDP_Recv(sock: PUDPsocket; packet: PUDPpacket): longint; lSDL;
 procedure SDLNet_UDP_Close(sock: PUDPsocket); lSDL;
 
@@ -161,7 +158,7 @@ function SDLNet_UDP_DelSocket(set_: PSDLNet_SocketSet;
 function SDLNet_CheckSockets(set_: PSDLNet_SocketSet;
                              timeout: Uint32): longint; lSDL;
 
-function SDLNet_SocketReady(sock: PSDLNet_GenericSocket): longint; inline;
+function SDLNet_SocketReady(sock: PSDLNet_GenericSocket): boolean; inline;
 
 procedure SDLNet_FreeSocketSet(set_: PSDLNet_SocketSet); lSDl;
 
@@ -210,12 +207,12 @@ begin
   SDLNet_UDP_DelSocket:=SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
 end;
 
-function SDLNet_SocketReady(sock: PSDLNet_GenericSocket): longint; inline;
+function SDLNet_SocketReady(sock: PSDLNet_GenericSocket): boolean; inline;
 begin
-  SDLNet_SocketReady:=longint((sock<>NIL) and (sock^.ready=1));
+  SDLNet_SocketReady:=(sock<>NIL) and (sock^.ready>1);
 end;
 
-{$IFDEF SDL_DATA_ALIGNED}
+{$IF NOT DEFINED(WITHOUT_SDL) AND NOT DEFINED(SDL_DATA_ALIGNED)}
 
 procedure SDLNet_Write16(value: Uint16; areap: pointer); inline;
 begin
