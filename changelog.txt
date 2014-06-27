@@ -1,5 +1,13 @@
 SDL2 headers for Free Pascal
 
+1.14 (27.06.14)
+  SDL2:
+    Float type (alias to single)
+    SDL_endian (aliases to native functions: Swap, BEtoN, LEtoN)
+    SDL_syswm
+  SDL2_net:
+    Unnecessary (and wrong) bit shifts are removed from SDL2_net
+
 1.13 (18.05.14)
   Critical fix in SDL_net definitions
   SDLNet_SocketReady now returns boolean

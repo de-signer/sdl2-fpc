@@ -165,10 +165,6 @@ procedure SDLNet_FreeSocketSet(set_: PSDLNet_SocketSet); lSDl;
 procedure SDLNet_SetError(const fmt: pchar); lSDL; varargs;
 function SDLNet_GetError: pchar; lSDL;
 
-{$IF DEFINED(CPUSPARC) OR DEFINED(CPUARM)}
-  {$DEFINE SDL_DATA_ALIGNED}
-{$ENDIF}
-
 procedure SDLNet_Write16(value: Uint16; areap: pointer); inline;
 procedure SDLNet_Write32(value: Uint32; areap: pointer); inline;
 function SDLNet_Read16(const areap: pointer): Uint16; inline;
@@ -212,8 +208,6 @@ begin
   SDLNet_SocketReady:=(sock<>NIL) and (sock^.ready>1);
 end;
 
-{$IF NOT DEFINED(WITHOUT_SDL) AND NOT DEFINED(SDL_DATA_ALIGNED)}
-
 procedure SDLNet_Write16(value: Uint16; areap: pointer); inline;
 begin
   PUint16(areap)[0]:=BEtoN(value);
@@ -233,42 +227,5 @@ function SDLNet_Read32(const areap: pointer): Uint32; inline;
 begin
   SDLNet_Read32:=BEtoN(PUint32(areap)[0]);
 end;
-
-{$ELSE}
-
-procedure SDLNet_Write16(value: Uint16; areap: pointer); inline;
-var
-  area: PUint8;
-begin
-  area:=areap;
-  area[0]:=(value shr 8) and $FF;
-  area[1]:=value         and $FF;
-end;
-
-procedure SDLNet_Write32(value: Uint32; areap: pointer); inline;
-var
-  area: PUint8;
-begin
-  area:=areap;
-  area[0]:=(value shr 24) and $FF;
-  area[1]:=(value shr 16) and $FF;
-  area[2]:=(value shr  8) and $FF;
-  area[3]:=value          and $FF;
-end;
-
-function SDLNet_Read16(const areap: pointer): Uint16; inline;
-begin
-  SDLNet_Read16:=PUint16(areap)[0] shl 8 or PUint16(areap)[1];
-end;
-
-function SDLNet_Read32(const areap: pointer): Uint32; inline;
-begin
-  SDLNet_Read32:=PUint32(areap)[0] shl 24 or
-                 PUint32(areap)[1] shl 16 or
-                 PUint32(areap)[2] shl 8 or
-                 PUint32(areap)[3];
-end;
-
-{$ENDIF}
 
 end.

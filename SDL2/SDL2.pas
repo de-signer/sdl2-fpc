@@ -13,10 +13,6 @@
     • SDL_atomic
     • SDL_assert
     • SDL_main
-    • SDL_syswm
-    • SDL_endian:
-        SDL_(LIL/BIG)_ENDIAN -> FPC_(LITTLE/BIG)_ENDIAN (or ENDIAN_(LITTLE/BIG))
-        SDL_SwapXX -> SwapEndian/LEToN/BEToN/NToLE/NToBE
 
 =====
 
@@ -35,7 +31,7 @@ interface
   {$linkframework SDL2}
 {$ENDIF}
 
-{$IFNDEF WINDOWS} //STDIO disabled on WIN by default (see SDL_config_windows.h)
+{$IFNDEF WINDOWS}
   {$DEFINE HAVE_STDIO_H}
 {$ENDIF}
 
@@ -53,9 +49,9 @@ type
   PUint16 = ^Uint16;
 
   Sint32 = longint;
-  PUint32 = ^Uint32; //longword
+  PUint32 = ^Uint32;
 
-  PUint64 = ^Uint64; //qword
+  PUint64 = ^Uint64;
   PSint64 = ^Sint64;
   Sint64 = int64;
 
@@ -63,6 +59,8 @@ type
   psize_t = ^size_t;
   TSDL_iconv_t = pointer;
   pwchar_t = plongint;
+
+  float = single;
 
 function SDL_malloc(size: size_t): pointer; lSDL;
 function SDL_calloc(nmemb, size: size_t): pointer; lSDL;
@@ -76,29 +74,21 @@ function SDL_setenv(const name, value: pchar;
 type
   comparefn=function(a1, a2: pointer): longint; cdecl;
 
-procedure SDL_qsort(base: pointer;
-                    nmemb, size: size_t; compare: comparefn); lSDL;
+procedure SDL_qsort(base: pointer; nmemb, size: size_t; compare: comparefn); lSDL;
 
 function SDL_memset(dst: pointer; c: longint; len: size_t): pointer; lSDL;
-function SDL_memcpy(dst: pointer; const src: pointer;
-                    len: size_t): pointer; lSDL;
-function SDL_memmove(dst: pointer; const src: pointer;
-                     len: size_t): pointer; lSDL;
+function SDL_memcpy(dst: pointer; const src: pointer; len: size_t): pointer; lSDL;
+function SDL_memmove(dst: pointer; const src: pointer; len: size_t): pointer; lSDL;
 function SDL_memcmp(const s1, s2: pointer; len: size_t): longint; lSDL;
 
 function SDL_wcslen(const wstr: pwchar_t): size_t; lSDL;
-function SDL_wcslcpy(dst: pwchar_t; const src: pwchar_t;
-                     maxlen: size_t): size_t; lSDL;
-function SDL_wcslcat(dst: pwchar_t; const src: pwchar_t;
-                     maxlen: size_t): size_t; lSDL;
+function SDL_wcslcpy(dst: pwchar_t; const src: pwchar_t; maxlen: size_t): size_t; lSDL;
+function SDL_wcslcat(dst: pwchar_t; const src: pwchar_t; maxlen: size_t): size_t; lSDL;
 
 function SDL_strlen(const str: pchar): size_t; lSDL;
-function SDL_strlcpy(dst: pchar; const src: pchar;
-                     maxlen: size_t): size_t; lSDL;
-function SDL_utf8strlcpy(dst: pchar; const src: pchar;
-                         dst_bytes: size_t): size_t; lSDL;
-function SDL_strlcat(dst: pchar; const src: pchar;
-                     maxlen: size_t): size_t; lSDL;
+function SDL_strlcpy(dst: pchar; const src: pchar; maxlen: size_t): size_t; lSDL;
+function SDL_utf8strlcpy(dst: pchar; const src: pchar; dst_bytes: size_t): size_t; lSDL;
+function SDL_strlcat(dst: pchar; const src: pchar; maxlen: size_t): size_t; lSDL;
 function SDL_strdup(const str: pchar): pchar; lSDL;
 function SDL_strrev(str: pchar): pchar; lSDL;
 function SDL_strupr(str: pchar): pchar; lSDL;
@@ -116,14 +106,10 @@ function SDL_ulltoa(value: Uint64; str: pchar; radix: longint): pchar; lSDL;
 
 function SDL_atoi(const str: pchar): longint; lSDL;
 function SDL_atof(const str: pchar): double; lSDL;
-function SDL_strtol(const str: pchar; endp: ppchar;
-                    base: longint): longint; lSDL;
-function SDL_strtoul(const str: pchar; endp: ppchar;
-                     base: longint): longword; lSDL;
-function SDL_strtoll(const str: pchar; endp: ppchar;
-                     base: longint): Sint64; lSDL;
-function SDL_strtoull(const str: pchar; endp: ppchar;
-                      base: longint): Uint64; lSDL;
+function SDL_strtol(const str: pchar; endp: ppchar; base: longint): longint; lSDL;
+function SDL_strtoul(const str: pchar; endp: ppchar; base: longint): longword; lSDL;
+function SDL_strtoll(const str: pchar; endp: ppchar; base: longint): Sint64; lSDL;
+function SDL_strtoull(const str: pchar; endp: ppchar; base: longint): Uint64; lSDL;
 function SDL_strtod(const str: pchar; endp: ppchar): double; lSDL;
 
 function SDL_strcmp(const str1, str2: pchar): longint; lSDL;
@@ -132,8 +118,7 @@ function SDL_strcasecmp(const str1, str2: pchar): longint; lSDL;
 function SDL_strncasecmp(const str1, str2: pchar; len: size_t): longint; lSDL;
 
 function SDL_sscanf(const text, fmt: pchar): longint; lSDL; varargs;
-function SDL_snprintf(text: pchar; maxlen: size_t;
-                      const fmt: pchar): longint; lSDL; varargs;
+function SDL_snprintf(text: pchar; maxlen: size_t; const fmt: pchar): longint; lSDL; varargs;
 
 function SDL_abs(x: longint): longint; lSDL;
 
@@ -158,8 +143,7 @@ function SDL_iconv_open(const tocode, fromcode: pchar): TSDL_iconv_t; lSDL;
 function SDL_iconv_close(cd: TSDL_iconv_t): longint; lSDL;
 function SDL_iconv(cd: TSDL_iconv_t; const inbuf: ppchar; inbytesleft: psize_t;
                    outbuf: ppchar; outbytesleft: psize_t): size_t; lSDL;
-function SDL_iconv_string(const tocode, fromcode,
-                          inbuf: pchar; inbytesleft: size_t): pchar; lSDl;
+function SDL_iconv_string(const tocode, fromcode, inbuf: pchar; inbytesleft: size_t): pchar; lSDl;
 function SDL_iconv_utf8_locale(S: pchar): pchar; inline;
 function SDL_iconv_utf8_ucs2(S: pchar): pchar; inline;
 function SDL_iconv_utf8_ucs4(S: pchar): pchar; inline;
@@ -179,12 +163,13 @@ const
   SDL_INIT_HAPTIC        =$00001000;
   SDL_INIT_GAMECONTROLLER=$00002000;
   SDL_INIT_NOPARACHUTE   =$00100000;
-  SDL_INIT_EVERYTHING=SDL_INIT_TIMER or
-                      SDL_INIT_AUDIO or
-                      SDL_INIT_VIDEO or
-                      SDL_INIT_JOYSTICK or
-                      SDL_INIT_HAPTIC or
-                      SDL_INIT_GAMECONTROLLER;
+  SDL_INIT_EVERYTHING=
+    SDL_INIT_TIMER or
+    SDL_INIT_AUDIO or
+    SDL_INIT_VIDEO or
+    SDL_INIT_JOYSTICK or
+    SDL_INIT_HAPTIC or
+    SDL_INIT_GAMECONTROLLER;
 
 function SDL_Init(flags: Uint32): longint; lSDL;
 function SDL_InitSubSystem(flags: Uint32): longint; lSDL;
@@ -257,8 +242,7 @@ type
                              priority: TSDL_LogPriority; message: pchar); cdecl;
 
 procedure SDL_LogSetAllPriority(priority: TSDL_LogPriority); lSDL;
-procedure SDL_LogSetPriority(category: longint;
-                             priority: TSDL_LogPriority); lSDL;
+procedure SDL_LogSetPriority(category: longint; priority: TSDL_LogPriority); lSDL;
 function SDL_GetPriority(category: longint): TSDL_LogPriority; lSDL;
 procedure SDL_LogResetPriorities; lSDL;
 procedure SDL_Log(fmt: pchar); lSDL; varargs;
@@ -268,12 +252,9 @@ procedure SDL_LogInfo(category: longint; fmt: pchar); lSDL; varargs;
 procedure SDL_LogWarn(category: longint; fmt: pchar); lSDL; varargs;
 procedure SDL_LogError(category: longint; fmt: pchar); lSDL; varargs;
 procedure SDL_LogCritical(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogMessage(category: longint; priority: TSDL_LogPriority;
-                         fmt: pchar); lSDL; varargs;
-procedure SDL_LogGetOutputFunction(callback: PSDL_LogOutputFunction;
-                                   userdata: ppointer); lSDL;
-procedure SDL_LogSetOutputFunction(callback: TSDL_LogOutputFunction;
-                                   userdata: pointer); lSDL;
+procedure SDL_LogMessage(category: longint; priority: TSDL_LogPriority; fmt: pchar); lSDL; varargs;
+procedure SDL_LogGetOutputFunction(callback: PSDL_LogOutputFunction; userdata: ppointer); lSDL;
+procedure SDL_LogSetOutputFunction(callback: TSDL_LogOutputFunction; userdata: pointer); lSDL;
 
 //=====SDL_HINTS=====
 
@@ -311,11 +292,9 @@ type
     SDL_HINT_NORMAL,
     SDL_HINT_OVERRIDE);
 
-  TSDL_HintCallback=procedure(userdata: pointer;
-                              name, oldValue, newValue: pchar); cdecl;
+  TSDL_HintCallback=procedure(userdata: pointer; name, oldValue, newValue: pchar); cdecl;
 
-function SDL_SetHintWithPriority(name, value: pchar;
-                                 priority: TSDL_HintPriority): SDL_bool; lSDL;
+function SDL_SetHintWithPriority(name, value: pchar; priority: TSDL_HintPriority): SDL_bool; lSDL;
 function SDL_SetHint(name, value: pchar): SDL_bool; lSDL;
 function SDL_GetHint(name: pchar): pchar; lSDL;
 procedure SDL_AddHintCallback(name: pchar; callback: TSDL_HintCallback;
@@ -416,8 +395,7 @@ procedure SDL_DestroyCond(cond: PSDL_Cond); lSDL;
 function SDL_CondSignal(cond: PSDL_Cond): longint; lSDL;
 function SDL_CondBroadcast(cond: PSDL_Cond): longint; lSDL;
 function SDL_CondWait(cond: PSDL_Cond; mutex: PSDL_Mutex): longint; lSDL;
-function SDL_CondWaitTimeout(cond: PSDL_Cond; mutex: PSDL_Mutex;
-                             ms: Uint32): longint; lSDL;
+function SDL_CondWaitTimeout(cond: PSDL_Cond; mutex: PSDL_Mutex; ms: Uint32): longint; lSDL;
 
 //=====SDL_THREAD=====
 
@@ -434,8 +412,7 @@ type
 
   TSDL_ThreadFunction=function(data: pointer): longint; cdecl;
 
-function SDL_CreateThread(fn: TSDL_ThreadFunction;
-                          name: pchar; data: pointer): PSDL_Thread; lSDL;
+function SDL_CreateThread(fn: TSDL_ThreadFunction; name: pchar; data: pointer): PSDL_Thread; lSDL;
 function SDL_GetThreadName(thread: PSDL_Thread): pchar; lSDL;
 function SDL_ThreadID: TSDL_threadID; lSDL;
 function SDL_GetThreadID(thread: PSDL_Thread): TSDL_threadID; lSDL;
@@ -445,8 +422,40 @@ procedure SDL_DetachThread(thread: PSDL_Thread); lSDL;
 
 function SDL_TLSCreate: TSDL_TLSID; lSDL;
 function SDL_TLSGet(id: TSDL_TLSID): pointer; lSDL;
-function SDL_TLSSet(id: TSDL_TLSID; const value: pointer;
-                    destructor_: pointer): longint; lSDL;
+function SDL_TLSSet(id: TSDL_TLSID; const value: pointer; destructor_: pointer): longint; lSDL;
+
+//=====SDL_ENDIAN=====
+
+const
+  SDL_LIL_ENDIAN=1234;
+  SDL_BIG_ENDIAN=4321;
+
+//we use typed const to prevent "unreachable code" warning
+{$J-}
+const
+{$IFDEF ENDIAN_LITTLE}
+  SDL_BYTEORDER: Uint16=SDL_LIL_ENDIAN;
+{$ELSE}
+  SDL_BYTEORDER: Uint16=SDL_BIG_ENDIAN;
+{$ENDIF}
+
+//aliases for Swap
+function SDL_Swap16(const x: Uint16): Uint16; inline;
+function SDL_Swap32(const x: Uint32): Uint32; inline;
+function SDL_Swap64(const x: Uint64): Uint64; inline;
+function SDL_SwapFloat(const x: float): float; inline;
+
+//aliases for LEtoN
+function SDL_SwapLE16(const x: Uint16): Uint16; inline;
+function SDL_SwapLE32(const x: Uint32): Uint32; inline;
+function SDL_SwapLE64(const x: Uint64): Uint64; inline;
+function SDL_SwapFloatLE(const x: float): float; inline;
+
+//aliases for BEtoN
+function SDL_SwapBE16(const x: Uint16): Uint16; inline;
+function SDL_SwapBE32(const x: Uint32): Uint32; inline;
+function SDL_SwapBE64(const x: Uint64): Uint64; inline;
+function SDL_SwapFloatBE(const x: float): float; inline;
 
 //=====SDL_RWOPS=====
 
@@ -518,24 +527,19 @@ type
     end;
   end;
 
-function SDL_RWFromFile(const file_: pchar;
-                        const mode: pchar): PSDL_RWops; lSDL;
+function SDL_RWFromFile(const file_: pchar; const mode: pchar): PSDL_RWops; lSDL;
 function SDL_RWFromFP(fp: pointer; autoclose: SDL_bool): PSDL_RWops; lSDL;
 function SDL_RWFromMem(mem: pointer; size: longint): PSDL_RWops; lSDL;
-function SDL_RWFromConstMem(const mem: pointer;
-                            size: longint): PSDL_RWops; lSDL;
+function SDL_RWFromConstMem(const mem: pointer; size: longint): PSDL_RWops; lSDL;
 
 function SDL_AllocRW: PSDL_RWops; lSDL;
 procedure SDL_FreeRW(area: PSDL_RWops); lSDL;
 
 function SDL_RWsize(ctx: PSDL_RWops): Sint64; inline;
-function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64;
-                    whence: longint): Sint64; inline;
+function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64; whence: longint): Sint64; inline;
 function SDL_RWtell(ctx: PSDL_RWops): Sint64; inline;
-function SDL_RWread(ctx: PSDL_RWops; ptr: pointer;
-                    size ,n: longword): longword; inline;
-function SDL_RWwrite(ctx: PSDL_RWops; ptr: pointer;
-                     size, n: longword): longword; inline;
+function SDL_RWread(ctx: PSDL_RWops; ptr: pointer; size ,n: longword): longword; inline;
+function SDL_RWwrite(ctx: PSDL_RWops; ptr: pointer; size, n: longword): longword; inline;
 function SDL_RWclose(ctx: PSDL_RWops): longint; inline;
 
 function SDL_ReadU8(src: PSDL_RWops): Uint8; lSDL;
@@ -563,16 +567,16 @@ const
   AUDIO_S16LSB=$8010;
   AUDIO_U16MSB=$1010;
   AUDIO_S16MSB=$9010;
-  AUDIO_U16   =AUDIO_U16LSB;
-  AUDIO_S16   =AUDIO_S16LSB;
+  AUDIO_U16=AUDIO_U16LSB;
+  AUDIO_S16=AUDIO_S16LSB;
 
   AUDIO_S32LSB=$8020;
   AUDIO_S32MSB=$9020;
-  AUDIO_S32   =AUDIO_S32LSB;
+  AUDIO_S32=AUDIO_S32LSB;
 
   AUDIO_F32LSB=$8120;
   AUDIO_F32MSB=$9120;
-  AUDIO_F32   =AUDIO_F32LSB;
+  AUDIO_F32=AUDIO_F32LSB;
 
 {$IFDEF FPC_LITTLE_ENDIAN}
   AUDIO_U16SYS=AUDIO_U16LSB;
@@ -590,15 +594,14 @@ const
   SDL_AUDIO_ALLOW_FORMAT_CHANGE   =$00000002;
   SDL_AUDIO_ALLOW_CHANNELS_CHANGE =$00000004;
   SDL_AUDIO_ALLOW_ANY_CHANGE=SDL_AUDIO_ALLOW_FREQUENCY_CHANGE or
-              SDL_AUDIO_ALLOW_FORMAT_CHANGE or SDL_AUDIO_ALLOW_CHANNELS_CHANGE;
+    SDL_AUDIO_ALLOW_FORMAT_CHANGE or SDL_AUDIO_ALLOW_CHANNELS_CHANGE;
 
   SDL_MIX_MAXVOLUME=128;
 
 type
   TSDL_AudioFormat=Uint16;
 
-  TSDL_AudioCallback=procedure(userdata: pointer; stream: PUint8;
-                               len: longint); cdecl;
+  TSDL_AudioCallback=procedure(userdata: pointer; stream: PUint8; len: longint); cdecl;
   PSDL_AudioSpec=^TSDL_AudioSpec;
   TSDL_AudioSpec=record
     freq: longint;
@@ -614,8 +617,7 @@ type
 
   PSDL_AudioCVT=^TSDL_AudioCVT;
 
-  TSDL_AudioFilter=procedure(cvt: PSDL_AudioCVT;
-                             format: TSDL_AudioFormat); cdecl;
+  TSDL_AudioFilter=procedure(cvt: PSDL_AudioCVT; format: TSDL_AudioFormat); cdecl;
 
   TSDL_AudioCVT=record
     needed: longint;
@@ -676,8 +678,7 @@ function SDL_BuildAudioCVT(cvt: PSDL_AudioCVT; src_format: TSDL_AudioFormat;
            src_channels: UInt8; src_rate: longint; dst_format: TSDL_AudioFormat;
            dst_channels: UInt8; dst_rate: longint): longint; lSDL;
 function SDL_ConvertAudio(cvt: PSDL_AudioCVT): longint; lSDL;
-procedure SDL_MixAudio(dst: PUint8; const src: PUint8;
-                       len: Uint32; volume: longint); lSDL;
+procedure SDL_MixAudio(dst: PUint8; const src: PUint8; len: Uint32; volume: longint); lSDL;
 procedure SDL_MixAudioFormat(dst: PUint8; const src: PUint8;
                   format: TSDL_AudioFormat; len: Uint32; volume: longint); lSDL;
 procedure SDL_LockAudio; lSDL;
@@ -839,14 +840,10 @@ function SDL_SetPixelFormatPalette(format: PSDL_PixelFormat;
 function SDL_SetPaletteColors(palette: PSDL_Palette; const colors: PSDL_Color;
                               firstcolor, ncolors: longint): longint; lSDL;
 procedure SDL_FreePalette(palette: PSDL_Palette); lSDL;
-function SDL_MapRGB(const format: PSDL_PixelFormat;
-                    r, g, b: Uint8): Uint32; lSDL;
-function SDL_MapRGBA(const format: PSDL_PixelFormat;
-                     r, g, b, a: Uint8): Uint32; lSDL;
-procedure SDL_GetRGB(pixel: Uint32; const format: PSDL_PixelFormat;
-                     r, g, b: PUint8); lSDL;
-procedure SDL_GetRGBA(pixel: Uint32; const format: PSDL_PixelFormat;
-                      r, g, b, a: PUint8); lSDL;
+function SDL_MapRGB(const format: PSDL_PixelFormat; r, g, b: Uint8): Uint32; lSDL;
+function SDL_MapRGBA(const format: PSDL_PixelFormat; r, g, b, a: Uint8): Uint32; lSDL;
+procedure SDL_GetRGB(pixel: Uint32; const format: PSDL_PixelFormat; r, g, b: PUint8); lSDL;
+procedure SDL_GetRGBA(pixel: Uint32; const format: PSDL_PixelFormat; r, g, b, a: PUint8); lSDL;
 procedure SDL_CalculateGammaRamp(gamma: single; ramp: PUint16); lSDL;
 
 //=====SDL_RECT=====
@@ -867,8 +864,7 @@ function SDL_RectEmpty(const x: PSDL_Rect): SDL_bool; inline;
 function SDL_RectEquals(const a, b: PSDL_Rect): SDL_bool; inline;
 
 function SDL_HasIntersection(const a, b: PSDL_Rect): SDL_bool; lSDL;
-function SDL_IntersectRect(const a, b: PSDL_Rect;
-                           result: PSDL_Rect): SDL_bool; lSDL;
+function SDL_IntersectRect(const a, b: PSDL_Rect; result: PSDL_Rect): SDL_bool; lSDL;
 procedure SDL_UnionRect(const a, b: PSDL_Rect; result: PSDL_Rect); lSDL;
 function SDL_EnclosePoints(const points: PSDL_Point; count: longint;
                       const clip: PSDL_Rect; result: PSDL_Rect): SDL_bool; lSDL;
@@ -912,49 +908,38 @@ type
 
 function SDL_MUSTLOCK(S: PSDL_Surface): boolean; inline;
 
-function SDL_CreateRGBSurface(flags: Uint32;width, height, depth: longint;
+function SDL_CreateRGBSurface(flags: Uint32; width, height, depth: longint;
                         Rmask, Gmask, Bmask, Amask: Uint32): PSDL_Surface; lSDL;
 function SDL_CreateRGBSurfaceFrom(pixels: pointer; width, height, depth,
         pitch: longint; Rmask, Gmask, Bmask, Amask: Uint32): PSDL_Surface; lSDL;
 procedure SDL_FreeSurface(surface: PSDL_Surface); lSDL;
 
-function SDL_SetSurfacePalette(surface: PSDL_Surface;
-                               palette: PSDL_Palette): longint; lSDL;
+function SDL_SetSurfacePalette(surface: PSDL_Surface; palette: PSDL_Palette): longint; lSDL;
 function SDL_LockSurface(surface: PSDL_Surface): longint; lSDL;
 procedure SDL_UnlockSurface(surface: PSDL_Surface); lSDL;
 function SDL_LoadBMP_RW(src: PSDL_RWops; freesrc: longint): PSDL_Surface; lSDL;
 function SDL_LoadBMP(file_: pchar): PSDL_Surface; inline;
-function SDL_SaveBMP_RW(surface: PSDL_Surface; dst: PSDL_RWops;
-                        freedst: longint): longint; lSDL;
+function SDL_SaveBMP_RW(surface: PSDL_Surface; dst: PSDL_RWops; freedst: longint): longint; lSDL;
 function SDL_SaveBMP(surface: PSDL_Surface; file_: pchar): longint; inline;
 function SDL_SetSurfaceRLE(surface: PSDL_Surface; flag: longint): longint; lSDL;
-function SDL_SetColorKey(surface: PSDL_Surface; flag: longint;
-                         key: Uint32): longint; lSDL;
+function SDL_SetColorKey(surface: PSDL_Surface; flag: longint; key: Uint32): longint; lSDL;
 function SDL_GetColorKey(surface: PSDL_Surface; key: PUint32): longint; lSDL;
-function SDL_SetSurfaceColorMod(surface: PSDL_Surface;
-                                r, g, b: Uint8): longint; lSDL;
-function SDL_GetSurfaceColorMod(surface: PSDL_Surface;
-                                r, g, b: PUint8): longint; lSDL;
-function SDL_SetSurfaceAlphaMod(surface: PSDL_Surface;
-                                alpha: Uint8): longint; lSDL;
-function SDL_GetSurfaceAlphaMod(surface: PSDL_Surface;
-                                alpha: PUint8): longint; lSDL;
-function SDL_SetSurfaceBlendMode(surface: PSDL_Surface;
-                                 blendMode: longword): longint; lSDL;
-function SDL_GetSurfaceBlendMode(surface: PSDL_Surface;
-                                 blendMode: plongword): longint; lSDL;
-function SDL_SetClipRect(surface: PSDL_Surface;
-                         const rect: PSDL_Rect): SDL_bool; lSDL;
+function SDL_SetSurfaceColorMod(surface: PSDL_Surface; r, g, b: Uint8): longint; lSDL;
+function SDL_GetSurfaceColorMod(surface: PSDL_Surface; r, g, b: PUint8): longint; lSDL;
+function SDL_SetSurfaceAlphaMod(surface: PSDL_Surface; alpha: Uint8): longint; lSDL;
+function SDL_GetSurfaceAlphaMod(surface: PSDL_Surface; alpha: PUint8): longint; lSDL;
+function SDL_SetSurfaceBlendMode(surface: PSDL_Surface; blendMode: longword): longint; lSDL;
+function SDL_GetSurfaceBlendMode(surface: PSDL_Surface; blendMode: plongword): longint; lSDL;
+function SDL_SetClipRect(surface: PSDL_Surface; const rect: PSDL_Rect): SDL_bool; lSDL;
 procedure SDL_GetClipRect(surface: PSDL_Surface; rect: PSDL_Rect); lSDL;
 function SDL_ConvertSurface(src: PSDL_Surface; fmt: PSDL_PixelFormat;
                             flags: Uint32): PSDL_Surface; lSDL;
 function SDL_ConvertSurfaceFormat(src: PSDL_Surface; pixel_format: Uint32;
                                   flags: Uint32): PSDL_Surface; lSDL;
 function SDL_ConvertPixels(width, height: longint;
-           src_format: Uint32; const src: pointer; src_pitch: longint;
-           dst_format: Uint32; dst: pointer; dst_pitch: longint): longint; lSDL;
-function SDL_FillRect(dst: PSDL_Surface; const rect: PSDL_Rect;
-                      color: Uint32): longint; lSDL;
+          src_format: Uint32; const src: pointer; src_pitch: longint;
+          dst_format: Uint32; dst: pointer; dst_pitch: longint): longint; lSDL;
+function SDL_FillRect(dst: PSDL_Surface; const rect: PSDL_Rect; color: Uint32): longint; lSDL;
 function SDL_FillRects(dst: PSDL_Surface; const rects: PSDL_Rect;
                        count: longint; color: Uint32): longint; lSDL;
 function SDL_BlitSurface(src: PSDL_Surface; const srcrect: PSDL_Rect;
@@ -1012,9 +997,9 @@ const
   SDL_WINDOWEVENT_FOCUS_LOST=13;
   SDL_WINDOWEVENT_CLOSE=14;
   //GLprofile
-  SDL_GL_CONTEXT_PROFILE_CORE         =$0001;
+  SDL_GL_CONTEXT_PROFILE_CORE=$0001;
   SDL_GL_CONTEXT_PROFILE_COMPATIBILITY=$0002;
-  SDL_GL_CONTEXT_PROFILE_ES           =$0004;
+  SDL_GL_CONTEXT_PROFILE_ES=$0004;
   //GLcontextFlag
   SDL_GL_CONTEXT_DEBUG_FLAG             =$0001;
   SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG=$0002;
@@ -1068,22 +1053,16 @@ procedure SDL_VideoQuit; lSDL;
 function SDL_GetCurrentVideoDriver: pchar; lSDL;
 function SDL_GetNumVideoDisplays: longint; lSDL;
 function SDL_GetDisplayName(displayIndex: longint): pchar; lSDL;
-function SDL_GetDisplayBounds(displayIndex: longint;
-                              rect: PSDL_Rect): longint; lSDL;
+function SDL_GetDisplayBounds(displayIndex: longint; rect: PSDL_Rect): longint; lSDL;
 function SDL_GetNumDisplayModes(displayIndex: longint): longint; lSDL;
-function SDL_GetDisplayMode(displayIndex, modeIndex: longint;
-                            mode: PSDL_DisplayMode): longint; lSDL;
-function SDL_GetDesktopDisplayMode(displayIndex: longint;
-                                   mode: PSDL_DisplayMode): longint; lSDL;
-function SDL_GetCurrentDisplayMode(displayIndex: longint;
-                                   mode: PSDL_DisplayMode): longint; lSDL;
+function SDL_GetDisplayMode(displayIndex, modeIndex: longint; mode: PSDL_DisplayMode): longint; lSDL;
+function SDL_GetDesktopDisplayMode(displayIndex: longint; mode: PSDL_DisplayMode): longint; lSDL;
+function SDL_GetCurrentDisplayMode(displayIndex: longint; mode: PSDL_DisplayMode): longint; lSDL;
 function SDL_GetClosestDisplayMode(displayIndex: longint;
                  const mode, closest: PSDL_DisplayMode): PSDL_DisplayMode; lSDL;
 function SDL_GetWindowDisplayIndex(window: PSDL_Window): longint; lSDL;
-function SDL_SetWindowDisplayMode(window: PSDL_Window;
-                                  const mode: PSDL_DisplayMode): longint; lSDL;
-function SDL_GetWindowDisplayMode(window: PSDL_Window;
-                                  mode: PSDL_DisplayMode): longint; lSDL;
+function SDL_SetWindowDisplayMode(window: PSDL_Window; const mode: PSDL_DisplayMode): longint; lSDL;
+function SDL_GetWindowDisplayMode(window: PSDL_Window; mode: PSDL_DisplayMode): longint; lSDL;
 function SDL_GetWindowPixelFormat(window: PSDL_Window): Uint32; lSDL;
 
 function SDL_CreateWindow(const title: pchar; x, y, w, h: longint;
@@ -1097,17 +1076,14 @@ function SDL_GetWindowTitle(window: PSDL_Window): pchar; lSDL;
 procedure SDL_SetWindowIcon(window: PSDL_Window; icon: PSDL_Surface); lSDL;
 function SDL_SetWindowData(window: PSDL_Window; const name: pchar;
                            userdata: pointer): pointer; lSDL;
-function SDL_GetWindowData(window: PSDL_Window;
-                           const name: pchar): pointer; lSDL;
+function SDL_GetWindowData(window: PSDL_Window; const name: pchar): pointer; lSDL;
 procedure SDL_SetWindowPosition(window: PSDL_Window; x, y: longint); lSDL;
 procedure SDL_GetWindowPosition(window: PSDL_Window; x, y: plongint); lSDL;
 procedure SDL_SetWindowSize(window: PSDL_Window; w, h: longint); lSDL;
 procedure SDL_GetWindowSize(window: PSDL_Window; w, h: plongint); lSDL;
-procedure SDL_SetWindowMinimumSize(window: PSDL_Window;
-                                   min_w, min_h: longint); lSDL;
+procedure SDL_SetWindowMinimumSize(window: PSDL_Window; min_w, min_h: longint); lSDL;
 procedure SDL_GetWindowMinimumSize(window: PSDL_Window; w, h: plongint); lSDL;
-procedure SDL_SetWindowMaximumSize(window: PSDL_Window;
-                                   max_w, max_h: longint); lSDL;
+procedure SDL_SetWindowMaximumSize(window: PSDL_Window; max_w, max_h: longint); lSDL;
 procedure SDL_GetWindowMaximumSize(window: PSDL_Window; w, h: plongint); lSDL;
 
 procedure SDL_SetWindowBordered(window: PSDL_Window; bordered: SDL_bool); lSDL;
@@ -1117,16 +1093,14 @@ procedure SDL_RaiseWindow(window: PSDL_Window); lSDL;
 procedure SDL_MaximizeWindow(window: PSDL_Window); lSDL;
 procedure SDL_MinimizeWindow(window: PSDL_Window); lSDL;
 procedure SDL_RestoreWindow(window: PSDL_Window); lSDL;
-function SDL_SetWindowFullscreen(window: PSDL_Window;
-                                 flags: Uint32): longint; lSDL;
+function SDL_SetWindowFullscreen(window: PSDL_Window; flags: Uint32): longint; lSDL;
 function SDL_GetWindowSurface(window: PSDL_Window): PSDL_Surface; lSDL;
 function SDL_UpdateWindowSurface(window: PSDL_Window): longint; lSDL;
 function SDL_UpdateWindowSurfaceRects(window: PSDL_Window; rects: PSDL_Rect;
                                       numrects: longint): longint; lSDL;
 procedure SDL_SetWindowGrab(window: PSDL_Window; grabbed: SDL_bool); lSDL;
 function SDL_GetWindowGrab(window: PSDL_Window): SDL_bool; lSDL;
-function SDL_SetWindowBrightness(window: PSDL_Window;
-                                 brightness: single): longint; lSDL;
+function SDL_SetWindowBrightness(window: PSDL_Window; brightness: single): longint; lSDL;
 function SDL_GetWindowBrightness(window: PSDL_Window): single; lSDL;
 function SDL_SetWindowGammaRamp(window: PSDL_Window;
                                 const red, green, blue: PUint16): longint; lSDL;
@@ -1146,8 +1120,7 @@ procedure SDL_GL_ResetAttributes; lSDL;
 function SDL_GL_SetAttribute(attr: SDL_GLattr; value: longint): longint; lSDL;
 function SDL_GL_GetAttribute(attr: SDL_GLattr; value: plongint): longint; lSDL;
 function SDL_GL_CreateContext(window: PSDL_Window): SDL_GLContext; lSDL;
-function SDL_GL_MakeCurrent(window: PSDL_Window;
-                            context: SDL_GLContext): longint; lSDL;
+function SDL_GL_MakeCurrent(window: PSDL_Window; context: SDL_GLContext): longint; lSDL;
 function SDL_GL_GetCurrentWindow: PSDL_Window; lSDL;
 function SDL_GL_GetCurrentContext: SDL_GLContext; lSDL;
 procedure SDL_GL_GetDrawableSize(window: PSDL_Window; w, h: plongint); lSDL;
@@ -1155,6 +1128,13 @@ function SDL_GL_SetSwapInterval(interval: longint): longint; lSDL;
 function SDL_GL_GetSwapInterval: longint; lSDL;
 procedure SDL_GL_SwapWindow(window: PSDL_Window); lSDL;
 procedure SDL_GL_DeleteContext(context: SDL_GLContext); lSDL;
+
+//=====SDL_SYSWM=====
+
+type
+  SDL_SysWMinfo=pointer;
+
+function SDL_GetWindowWMInfo(window: PSDL_Window; info: SDL_SysWMinfo): SDL_bool; lSDL;
 
 //=====SDL_SHAPE=====
 
@@ -1225,37 +1205,26 @@ type
   PSDL_Texture=pointer;
 
 function SDL_GetNumRenderDrivers: longint; lSDL;
-function SDL_GetRenderDriverInfo(index: longint;
-                                 info: PSDL_RendererInfo): longint; lSDL;
+function SDL_GetRenderDriverInfo(index: longint; info: PSDL_RendererInfo): longint; lSDL;
 function SDL_CreateWindowAndRenderer(width, height: longint;
                                      window_flags: Uint32; window: PPSDL_Window;
                                      renderer: PPSDL_Renderer): longint; lSDL;
-function SDL_CreateRenderer(window: PSDL_Window;
-                            index: longint; flags: Uint32): PSDL_Renderer; lSDL;
+function SDL_CreateRenderer(window: PSDL_Window; index: longint; flags: Uint32): PSDL_Renderer; lSDL;
 function SDL_CreateSoftwareRenderer(surface: PSDL_Surface): PSDL_Renderer; lSDL;
 function SDL_GetRenderer(window: PSDL_Window): PSDL_Renderer; lSDL;
-function SDL_GetRendererInfo(renderer: PSDL_Renderer;
-                             info: PSDL_RendererInfo): longint; lSDL;
-function SDL_GetRendererOutputSize(renderer: PSDL_Renderer;
-                                   w, h: plongint): longint; lSDL;
+function SDL_GetRendererInfo(renderer: PSDL_Renderer; info: PSDL_RendererInfo): longint; lSDL;
+function SDL_GetRendererOutputSize(renderer: PSDL_Renderer; w, h: plongint): longint; lSDL;
 function SDL_CreateTexture(renderer: PSDL_Renderer; format: Uint32;
                            access, w, h: longint): PSDL_Texture; lSDL;
-function SDL_CreateTextureFromSurface(renderer: PSDL_Renderer;
-                                     surface: PSDL_Surface): PSDL_Texture; lSDL;
+function SDL_CreateTextureFromSurface(renderer: PSDL_Renderer; surface: PSDL_Surface): PSDL_Texture; lSDL;
 function SDL_QueryTexture(texture: PSDL_Texture; format: PUint32;
                           access, w, h: plongint): longint; lSDL;
-function SDL_SetTextureColorMod(texture: PSDL_Texture;
-                                r, g, b: Uint8): longint; lSDL;
-function SDL_GetTextureColorMod(texture: PSDL_Texture;
-                                r, g, b: PUint8): longint; lSDL;
-function SDL_SetTextureAlphaMod(texture: PSDL_Texture;
-                                alpha: Uint8): longint; lSDL;
-function SDL_GetTextureAlphaMod(texture: PSDL_Texture;
-                                alpha: PUint8): longint; lSDL;
-function SDL_SetTextureBlendMode(texture: PSDL_Texture;
-                                 blendMode: longword): longint; lSDL;
-function SDL_GetTextureBlendMode(texture: PSDL_Texture;
-                                 blendMode: plongword): longint; lSDL;
+function SDL_SetTextureColorMod(texture: PSDL_Texture; r, g, b: Uint8): longint; lSDL;
+function SDL_GetTextureColorMod(texture: PSDL_Texture; r, g, b: PUint8): longint; lSDL;
+function SDL_SetTextureAlphaMod(texture: PSDL_Texture; alpha: Uint8): longint; lSDL;
+function SDL_GetTextureAlphaMod(texture: PSDL_Texture; alpha: PUint8): longint; lSDL;
+function SDL_SetTextureBlendMode(texture: PSDL_Texture; blendMode: longword): longint; lSDL;
+function SDL_GetTextureBlendMode(texture: PSDL_Texture; blendMode: plongword): longint; lSDL;
 function SDL_UpdateTexture(texture: PSDL_Texture; const rect: PSDL_Rect;
                           const pixels: pointer; pitch: longint): longint; lSDL;
 function SDL_UpdateYUVTexture(texture: PSDL_Texture; const rect: PSDL_Rect;
@@ -1266,61 +1235,41 @@ function SDL_LockTexture(texture: PSDL_Texture; const rect: PSDL_Rect;
                          pixels: ppointer; pitch: plongint): longint; lSDL;
 procedure SDL_UnlockTexture(texture: PSDL_Texture); lSDL;
 function SDL_RenderTargetSupported(renderer: PSDL_Renderer): SDL_bool; lSDL;
-function SDL_SetRenderTarget(renderer: PSDL_Renderer;
-                             texture: PSDL_Texture): longint; lSDL;
+function SDL_SetRenderTarget(renderer: PSDL_Renderer; texture: PSDL_Texture): longint; lSDL;
 function SDL_GetRenderTarget(renderer: PSDL_Renderer): PSDL_Texture; lSDL;
-function SDL_RenderSetLogicalSize(renderer: PSDL_Renderer;
-                                  w, h: longint): longint; lSDL;
-procedure SDL_RenderGetLogicalSize(renderer: PSDL_Renderer;
-                                   w, h: plongint); lSDL;
-function SDL_RenderSetViewport(renderer: PSDL_Renderer;
-                               const rect: PSDL_Rect): longint; lSDL;
+function SDL_RenderSetLogicalSize(renderer: PSDL_Renderer; w, h: longint): longint; lSDL;
+procedure SDL_RenderGetLogicalSize(renderer: PSDL_Renderer; w, h: plongint); lSDL;
+function SDL_RenderSetViewport(renderer: PSDL_Renderer; const rect: PSDL_Rect): longint; lSDL;
 procedure SDL_RenderGetViewport(renderer: PSDL_Renderer; rect: PSDL_Rect); lSDL;
-function SDL_RenderSetClipRect(renderer: PSDL_Renderer;
-                               const rect: PSDL_Rect): longint; lSDL;
+function SDL_RenderSetClipRect(renderer: PSDL_Renderer; const rect: PSDL_Rect): longint; lSDL;
 procedure SDL_RenderGetClipRect(renderer: PSDL_Renderer; rect: PSDL_Rect); lSDL;
-function SDL_RenderSetScale(renderer: PSDL_Renderer;
-                            scaleX, scaleY: single): longint; lSDL;
-procedure SDL_RenderGetScale(renderer: PSDL_Renderer;
-                             scaleX, scaleY: psingle); lSDL;
+function SDL_RenderSetScale(renderer: PSDL_Renderer; scaleX, scaleY: single): longint; lSDL;
+procedure SDL_RenderGetScale(renderer: PSDL_Renderer; scaleX, scaleY: psingle); lSDL;
 
-function SDL_SetRenderDrawColor(renderer: PSDL_Renderer;
-                                r, g, b, a: Uint8): longint; lSDL;
-function SDL_GetRenderDrawColor(renderer: PSDL_Renderer;
-                                r, g, b, a: PUint8): longint; lSDL;
-function SDL_SetRenderDrawBlendMode(renderer: PSDL_Renderer;
-                                    blendMode: longword): longint; lSDL;
-function SDL_GetRenderDrawBlendMode(renderer: PSDL_Renderer;
-                                    blendMode: plongword): longint; lSDL;
+function SDL_SetRenderDrawColor(renderer: PSDL_Renderer; r, g, b, a: Uint8): longint; lSDL;
+function SDL_GetRenderDrawColor(renderer: PSDL_Renderer; r, g, b, a: PUint8): longint; lSDL;
+function SDL_SetRenderDrawBlendMode(renderer: PSDL_Renderer; blendMode: longword): longint; lSDL;
+function SDL_GetRenderDrawBlendMode(renderer: PSDL_Renderer; blendMode: plongword): longint; lSDL;
 
 function SDL_RenderClear(renderer: PSDL_Renderer): longint; lSDL;
-function SDL_RenderDrawPoint(renderer: PSDL_Renderer;
-                             x, y: longint): longint; lSDL;
+function SDL_RenderDrawPoint(renderer: PSDL_Renderer; x, y: longint): longint; lSDL;
 function SDL_RenderDrawPoints(renderer: PSDL_Renderer; const points: PSDL_Point;
                               count: longint): longint; lSDL;
-function SDL_RenderDrawLine(renderer: PSDL_Renderer;
-                            x1, y1, x2, y2: longint): longint; lSDL;
+function SDL_RenderDrawLine(renderer: PSDL_Renderer; x1, y1, x2, y2: longint): longint; lSDL;
 function SDL_RenderDrawLines(renderer: PSDL_Renderer; const points: PSDL_Point;
                              count: longint): longint; lSDL;
-function SDL_RenderDrawRect(renderer: PSDL_Renderer;
-                            const rect: PSDL_Rect): longint; lSDL;
+function SDL_RenderDrawRect(renderer: PSDL_Renderer; const rect: PSDL_Rect): longint; lSDL;
 function SDL_RenderDrawRects(renderer: PSDL_Renderer; const rects: PSDL_Rect;
                              count: longint): longint; lSDL;
-function SDL_RenderFillRect(renderer: PSDL_Renderer;
-                            const rect: PSDL_Rect): longint; lSDL;
+function SDL_RenderFillRect(renderer: PSDL_Renderer; const rect: PSDL_Rect): longint; lSDL;
 function SDL_RenderFillRects(renderer: PSDL_Renderer; const rects: PSDL_Rect;
                              count: longint): longint; lSDL;
 
-function SDL_RenderCopy(renderer: PSDL_Renderer;
-                        texture: PSDL_Texture;
-                        const srcrect,
-                        dstrect: PSDL_Rect): longint; lSDL;
-function SDL_RenderCopyEx(renderer: PSDL_Renderer;
-                          texture: PSDL_Texture;
-                          const srcrect,
-                          dstrect: PSDL_Rect;
-                          const angle: double;
-                          const center: PSDL_Point;
+function SDL_RenderCopy(renderer: PSDL_Renderer; texture: PSDL_Texture;
+                        const srcrect, dstrect: PSDL_Rect): longint; lSDL;
+function SDL_RenderCopyEx(renderer: PSDL_Renderer; texture: PSDL_Texture;
+                          const srcrect, dstrect: PSDL_Rect;
+                          const angle: double; const center: PSDL_Point;
                           const flip: longword): longint; lSDL;
 function SDL_RenderReadPixels(renderer: PSDL_Renderer;
                               const rect: PSDL_Rect;
@@ -1331,8 +1280,7 @@ procedure SDL_RenderPresent(renderer: PSDL_Renderer); lSDL;
 procedure SDL_DestroyTexture(texture: PSDL_Texture); lSDL;
 procedure SDL_DestroyRenderer(renderer: PSDL_Renderer); lSDL;
 
-function SDL_GL_BindTexture(texture: PSDL_Texture;
-                            texw, texh: psingle): longint; lSDL;
+function SDL_GL_BindTexture(texture: PSDL_Texture; texw, texh: psingle): longint; lSDL;
 function SDL_GL_UnbindTexture(texture: PSDL_Texture): longint; lSDL;
 
 //=====SDL_MESSAGEBOX=====
@@ -2003,10 +1951,8 @@ procedure SDL_WarpMouseInWindow(window: PSDL_Window; x, y: longint); lSDL;
 function SDL_SetRelativeMouseMode(enabled: SDL_bool): longint; lSDL;
 function SDL_GetRelativeMouseMode: SDL_bool; lSDL;
 
-function SDL_CreateCursor(const data , mask: PUint8;
-                          w, h, hot_x, hot_y: longint): PSDL_Cursor; lSDL;
-function SDL_CreateColorCursor(surface: PSDL_Surface;
-                               hot_x, hot_y: longint): PSDL_Cursor; lSDL;
+function SDL_CreateCursor(const data , mask: PUint8; w, h, hot_x, hot_y: longint): PSDL_Cursor; lSDL;
+function SDL_CreateColorCursor(surface: PSDL_Surface; hot_x, hot_y: longint): PSDL_Cursor; lSDL;
 function SDL_CreateSystemCursor(id: longword): PSDL_Cursor; lSDL;
 procedure SDL_SetCursor(cursor: PSDL_Cursor); lSDL;
 function SDL_GetCursor: PSDL_Cursor; lSDL;
@@ -2041,8 +1987,7 @@ function SDL_JoystickOpen(device_index: longint): PSDL_Joystick; lSDL;
 function SDL_JoystickName(joystick: PSDL_Joystick): pchar; lSDL;
 function SDL_JoystickGetDeviceGUID(device_index: longint): TSDL_JoystickGUID; lSDL;
 function SDL_JoystickGetGUID(joystick: PSDL_Joystick): TSDL_JoystickGUID; lSDL;
-procedure SDL_JoystickGetGUIDString(guid: TSDL_JoystickGUID; pszGUID: pchar;
-                                    cbGUID: longint); lSDL;
+procedure SDL_JoystickGetGUIDString(guid: TSDL_JoystickGUID; pszGUID: pchar; cbGUID: longint); lSDL;
 function SDL_JoystickGetGUIDFromString(pszGUID: pchar): TSDL_JoystickGUID; lSDL;
 function SDL_JoystickGetAttached(joystick: PSDL_Joystick): SDL_bool; lSDL;
 function SDL_JoystickInstanceID(joystick: PSDL_Joystick): TSDL_JoystickID; lSDL;
@@ -2052,13 +1997,10 @@ function SDL_JoystickNumHats(joystick: PSDL_Joystick): longint; lSDL;
 function SDL_JoystickNumButtons(joystick: PSDL_Joystick): longint; lSDL;
 procedure SDL_JoystickUpdate; lSDL;
 function SDL_JoystickEventState(state: longint): longint; lSDL;
-function SDL_JoystickGetAxis(joystick: PSDL_Joystick;
-                             axis: longint): Sint16; lSDL;
+function SDL_JoystickGetAxis(joystick: PSDL_Joystick; axis: longint): Sint16; lSDL;
 function SDL_JoystickGetHat(joystick: PSDL_Joystick; hat: longint): Uint8; lSDL;
-function SDL_JoystickGetBall(joystick: PSDL_Joystick; ball: longint;
-                             dx, dy: plongint): longint; lSDL;
-function SDL_JoystickGetButton(joystick: PSDL_Joystick;
-                               button: longint): Uint8; lSDL;
+function SDL_JoystickGetBall(joystick: PSDL_Joystick; ball: longint; dx, dy: plongint): longint; lSDL;
+function SDL_JoystickGetButton(joystick: PSDL_Joystick; button: longint): Uint8; lSDL;
 procedure SDL_JoystickClose(joystick: PSDL_Joystick); lSDL;
 
 //=====SDL_GAMECONTROLLER=====
@@ -2115,8 +2057,7 @@ type
     end;
   end;
 
-function SDL_GameControllerAddMappingsFromRW(rw: PSDL_RWops;
-                                             freerw: longint): longint; lSDL;
+function SDL_GameControllerAddMappingsFromRW(rw: PSDL_RWops; freerw: longint): longint; lSDL;
 function SDL_GameControllerAddMappingsFromFile(file_: pchar): longint; inline;
 
 function SDL_GameControllerAddMapping(mapping: pchar): longint; lSDL;
@@ -2295,29 +2236,21 @@ function SDL_HapticNumEffects(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticNumEffectsPlaying(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticQuery(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticNumAxes(haptic: PSDL_Haptic): longint; lSDL;
-function SDL_HapticEffectSupported(haptic: PSDL_Haptic;
-                                   effect: PSDL_HapticEffect): longint; lSDL;
-function SDL_HapticNewEffect(haptic: PSDL_Haptic;
-                             effect: PSDL_HapticEffect): longint; lSDL;
-function SDL_HapticUpdateEffect(haptic: PSDL_Haptic; effect: longint;
-                                data: PSDL_HapticEffect): longint; lSDL;
-function SDL_HapticRunEffect(haptic: PSDL_Haptic; effect: longint;
-                             iterations: Uint32): longint; lSDL;
-function SDL_HapticStopEffect(haptic: PSDL_Haptic;
-                              effect: longint): longint; lSDL;
+function SDL_HapticEffectSupported(haptic: PSDL_Haptic; effect: PSDL_HapticEffect): longint; lSDL;
+function SDL_HapticNewEffect(haptic: PSDL_Haptic; effect: PSDL_HapticEffect): longint; lSDL;
+function SDL_HapticUpdateEffect(haptic: PSDL_Haptic; effect: longint; data: PSDL_HapticEffect): longint; lSDL;
+function SDL_HapticRunEffect(haptic: PSDL_Haptic; effect: longint; iterations: Uint32): longint; lSDL;
+function SDL_HapticStopEffect(haptic: PSDL_Haptic; effect: longint): longint; lSDL;
 procedure SDL_HapticDestroyEffect(haptic: PSDL_Haptic; effect: longint); lSDL;
-function SDL_HapticGetEffectStatus(haptic: PSDL_Haptic;
-                                   effect: longint): longint; lSDL;
+function SDL_HapticGetEffectStatus(haptic: PSDL_Haptic; effect: longint): longint; lSDL;
 function SDL_HapticSetGain(haptic: PSDL_Haptic; gain: longint): longint; lSDL;
-function SDL_HapticSetAutocenter(haptic: PSDL_Haptic;
-                                 autocenter: longint): longint; lSDL;
+function SDL_HapticSetAutocenter(haptic: PSDL_Haptic; autocenter: longint): longint; lSDL;
 function SDL_HapticPause(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticUnpause(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticStopAll(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticRumbleSupported(haptic: PSDL_Haptic): longint; lSDL;
 function SDL_HapticRumbleInit(haptic: PSDL_Haptic): longint; lSDL;
-function SDL_HapticRumblePlay(haptic: PSDL_Haptic;
-                              strength: single; length: Uint32): longint; lSDL;
+function SDL_HapticRumblePlay(haptic: PSDL_Haptic; strength: single; length: Uint32): longint; lSDL;
 function SDL_HapticRumbleStop(haptic: PSDL_Haptic): longint; lSDL;
 
 //=====SDL_TOUCH=====
@@ -2339,8 +2272,7 @@ const
 function SDL_GetNumTouchDevices: longint; lSDL;
 function SDL_GetTouchDevice(index: longint): TSDL_TouchID; lSDL;
 function SDL_GetNumTouchFingers(touchID: TSDL_TouchID): longint; lSDL;
-function SDL_GetTouchFinger(touchID: TSDL_TouchID;
-                            index: longint): PSDL_Finger; lSDL;
+function SDL_GetTouchFinger(touchID: TSDL_TouchID; index: longint): PSDL_Finger; lSDL;
 
 //======SDL_GESTURE=====
 
@@ -2349,10 +2281,8 @@ type
 
 function SDL_RecordGesture(touchId: TSDL_TouchID): longint; lSDL;
 function SDL_SaveAllDollarTemplates(src: PSDL_RWops): longint; lSDL;
-function SDL_SaveDollarTemplate(gestureId: TSDL_GestureID;
-                                src: PSDL_RWops): longint; lSDL;
-function SDL_LoadDollarTemplates(touchId: TSDL_TouchID;
-                                 src: PSDL_RWops): longint; lSDL;
+function SDL_SaveDollarTemplate(gestureId: TSDL_GestureID; src: PSDL_RWops): longint; lSDL;
+function SDL_LoadDollarTemplates(touchId: TSDL_TouchID; src: PSDL_RWops): longint; lSDL;
 
 //=====SDL_EVENTS=====
 
@@ -2689,8 +2619,7 @@ type
     SDL_GETEVENT);
 
   PSDL_EventFilter=^TSDL_EventFilter;
-  TSDL_EventFilter=function(userdata: pointer;
-                            event: PSDL_Event): longint; cdecl;
+  TSDL_EventFilter=function(userdata: pointer; event: PSDL_Event): longint; cdecl;
 
 function SDL_QuitRequested: boolean; inline;
 
@@ -2704,13 +2633,10 @@ procedure SDL_FlushEvent(type_: Uint32); lSDL;
 procedure SDL_FlushEvents(minType, maxType: Uint32); lSDL;
 function SDL_PollEvent(event: PSDL_Event): longint; lSDL;
 function SDL_WaitEvent(event: PSDL_Event): longint; lSDL;
-function SDL_WaitEventTimeout(event: PSDL_Event;
-                              timeout: longint): longint; lSDL;
+function SDL_WaitEventTimeout(event: PSDL_Event; timeout: longint): longint; lSDL;
 function SDL_PushEvent(event: PSDL_Event): longint; lSDL;
-procedure SDL_SetEventFilter(filter: TSDL_EventFilter;
-                             userdata: pointer); lSDL;
-function SDL_GetEventFilter(filter: PSDL_EventFilter;
-                            userdata: ppointer): SDL_bool; lSDL;
+procedure SDL_SetEventFilter(filter: TSDL_EventFilter; userdata: pointer); lSDL;
+function SDL_GetEventFilter(filter: PSDL_EventFilter; userdata: ppointer): SDL_bool; lSDL;
 procedure SDL_AddEventWatch(filter: TSDL_EventFilter; userdata: pointer); lSDL;
 procedure SDL_DelEventWatch(filter: TSDL_EventFilter; userdata: pointer); lSDL;
 procedure SDL_FilterEvents(filter: TSDL_EventFilter; userdata: pointer); lSDL;
@@ -2722,15 +2648,12 @@ function SDL_RegisterEvents(numevents: longint): Uint32; lSDL;
 {$IFDEF WINDOWS}
 function SDL_Direct3D9GetAdapterIndex(displayIndex: longint): longint; lSDL;
 function SDL_RenderGetD3D9Device(renderer: PSDL_Renderer): pointer; lSDL;
-procedure SDL_DXGIGetOutputInfo(displayIndex: longint;
-                                adapterIndex, outputIndex: plongint); lSDL;
+procedure SDL_DXGIGetOutputInfo(displayIndex: longint; adapterIndex, outputIndex: plongint); lSDL;
 {$ENDIF}
 
 {$IFDEF IPHONEOS}
 function SDL_iPhoneSetAnimationCallback(window: PSDL_Window;
-                                        interval: longint;
-                                        callback,
-                                        callbackParam: pointer); lSDL;
+                    interval: longint; callback, callbackParam: pointer); lSDL;
 procedure SDL_iPhoneSetEventPump(enabled: SDL_bool); lSDL;
 {$ENDIF}
 
@@ -2819,6 +2742,84 @@ end;
 function SDL_MutexV(mutex: PSDL_Mutex): longint; inline;
 begin
   SDL_MutexV:=SDL_UnlockMutex(mutex);
+end;
+
+//=====SDL_ENDIAN=====
+
+function SDL_Swap16(const x: Uint16): Uint16; inline;
+begin
+  SDL_Swap16:=Swap(x);
+end;
+
+function SDL_Swap32(const x: Uint32): Uint32; inline;
+begin
+  SDL_Swap32:=Swap(x);
+end;
+
+function SDL_Swap64(const x: Uint64): Uint64; inline;
+begin
+  SDL_Swap64:=Swap(x);
+end;
+
+function SDL_SwapFloat(const x: float): float; inline;
+var
+  swapper: record
+    case byte of
+      1: (f: float);
+      2: (ui32: Uint32);
+  end;
+begin
+  swapper.f:=x;
+  swapper.ui32:=Swap(swapper.ui32);
+  SDL_SwapFloat:=swapper.f;
+end;
+
+function SDL_SwapLE16(const x: Uint16): Uint16; inline;
+begin
+  SDL_SwapLE16:=LEtoN(x);
+end;
+
+function SDL_SwapLE32(const x: Uint32): Uint32; inline;
+begin
+  SDL_SwapLE32:=LEtoN(x);
+end;
+
+function SDL_SwapLE64(const x: Uint64): Uint64; inline;
+begin
+  SDL_SwapLE64:=LEtoN(x);
+end;
+
+function SDL_SwapFloatLE(const x: float): float; inline;
+begin
+  {$IFDEF ENDIAN_LITTLE}
+  SDL_SwapFloatLE:=x;
+  {$ELSE}
+  SDL_SwapFloatLE:=SDL_SwapFloat(x);
+  {$ENDIF}
+end;
+
+function SDL_SwapBE16(const x: Uint16): Uint16; inline;
+begin
+  SDL_SwapBE16:=BEtoN(x);
+end;
+
+function SDL_SwapBE32(const x: Uint32): Uint32; inline;
+begin
+  SDL_SwapBE32:=BEtoN(x);
+end;
+
+function SDL_SwapBE64(const x: Uint64): Uint64; inline;
+begin
+  SDL_SwapBE64:=BEtoN(x);
+end;
+
+function SDL_SwapFloatBE(const x: float): float; inline;
+begin
+  {$IFDEF ENDIAN_BIG}
+  SDL_SwapFloatBE:=x;
+  {$ELSE}
+  SDL_SwapFloatBE:=SDL_SwapFloat(x);
+  {$ENDIF}
 end;
 
 //=====SDL_RWOPS=====
