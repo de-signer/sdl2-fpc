@@ -1,5 +1,9 @@
 SDL2 headers for Free Pascal
 
+1.15 (13.08.14)
+  Fixed bug in SDL_SwapXX functions
+  Added Mix_Linked_Version
+
 1.14 (27.06.14)
   SDL2:
     Float type (alias to single)

@@ -88,39 +88,25 @@ function TTF_GlyphIsProvided(const font: PTTF_Font; ch: Uint16): longint; lSDL;
 function TTF_GlyphMetrics(font: PTTF_Font; ch: Uint16;
                       minx, maxx, miny, maxy, advance: plongint): longint; lSDL;
 
-function TTF_SizeText(font: PTTF_Font; const text: pchar;
-                      w, h: plongint): longint; lSDL;
-function TTF_SizeUTF8(font: PTTF_Font; const text: pchar;
-                      w, h: plongint): longint; lSDL;
-function TTF_SizeUNICODE(font: PTTF_Font; const text: PUint16;
-                         w, h: plongint): longint; lSDL;
+function TTF_SizeText(font: PTTF_Font; const text: pchar; w, h: plongint): longint; lSDL;
+function TTF_SizeUTF8(font: PTTF_Font; const text: pchar; w, h: plongint): longint; lSDL;
+function TTF_SizeUNICODE(font: PTTF_Font; const text: PUint16; w, h: plongint): longint; lSDL;
 
-function TTF_RenderText_Solid(font: PTTF_Font; const text: pchar;
-                              fg: TSDL_Color): PSDL_Surface; lSDL;
-function TTF_RenderUTF8_Solid(font: PTTF_Font; const text: pchar;
-                              fg: TSDL_Color): PSDL_Surface; lSDL;
-function TTF_RenderUNICODE_Solid(font: PTTF_Font; const text: PUint16;
-                                 fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderText_Solid(font: PTTF_Font; const text: pchar; fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderUTF8_Solid(font: PTTF_Font; const text: pchar; fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderUNICODE_Solid(font: PTTF_Font; const text: PUint16; fg: TSDL_Color): PSDL_Surface; lSDL;
 
-function TTF_RenderGlyph_Solid(font: PTTF_Font; ch: Uint16;
-                               fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderGlyph_Solid(font: PTTF_Font; ch: Uint16; fg: TSDL_Color): PSDL_Surface; lSDL;
 
-function TTF_RenderText_Shaded(font: PTTF_Font; const text: pchar;
-                               fg, bg: TSDL_Color): PSDL_Surface; lSDL;
-function TTF_RenderUTF8_Shaded(font: PTTF_Font; const text: pchar;
-                               fg, bg: TSDL_Color): PSDL_Surface; lSDL;
-function TTF_RenderUNICODE_Shaded(font: PTTF_Font; const text: PUint16;
-                               fg, bg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderText_Shaded(font: PTTF_Font; const text: pchar; fg, bg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderUTF8_Shaded(font: PTTF_Font; const text: pchar; fg, bg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderUNICODE_Shaded(font: PTTF_Font; const text: PUint16; fg, bg: TSDL_Color): PSDL_Surface; lSDL;
 
-function TTF_RenderGlyph_Shaded(font: PTTF_Font; ch: Uint16;
-                                fg, bg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderGlyph_Shaded(font: PTTF_Font; ch: Uint16; fg, bg: TSDL_Color): PSDL_Surface; lSDL;
 
-function TTF_RenderText_Blended(font: PTTF_Font; const text: pchar;
-                                fg: TSDL_Color): PSDL_Surface; lSDL;
-function TTF_RenderUTF8_Blended(font: PTTF_Font; const text: pchar;
-                                fg: TSDL_Color): PSDL_Surface; lSDL;
-function TTF_RenderUNICODE_Blended(font: PTTF_Font; const text: PUint16;
-                                   fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderText_Blended(font: PTTF_Font; const text: pchar; fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderUTF8_Blended(font: PTTF_Font; const text: pchar; fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderUNICODE_Blended(font: PTTF_Font; const text: PUint16; fg: TSDL_Color): PSDL_Surface; lSDL;
 
 function TTF_RenderText_Blended_Wrapped(font: PTTF_Font; const text: pchar;
                         fg: TSDL_Color; wrapLength: Uint32): PSDL_Surface; lSDL;
@@ -129,19 +115,16 @@ function TTF_RenderUTF8_Blended_Wrapped(font: PTTF_Font; const text: pchar;
 function TTF_RenderUNICODE_Blended_Wrapped(font: PTTF_Font; const text: PUint16;
                         fg: TSDL_Color; wrapLength: Uint32): PSDL_Surface; lSDL;
 
-function TTF_RenderGlyph_Blended(font: PTTF_Font; ch: Uint16;
-                                 fg: TSDL_Color): PSDL_Surface; lSDL;
+function TTF_RenderGlyph_Blended(font: PTTF_Font; ch: Uint16; fg: TSDL_Color): PSDL_Surface; lSDL;
 
 procedure TTF_CloseFont(font: PTTF_Font); lSDL;
 procedure TTF_Quit; lSDL;
 
 function TTF_WasInit: longint; lSDL;
 
-function TTF_GetFontKerningSize(font: PTTF_Font;
-                                prev_index, index: longint): longint; lSDl;
+function TTF_GetFontKerningSize(font: PTTF_Font; prev_index, index: longint): longint; lSDl;
 
-function TTF_SetError(const fmt: pchar): longint; cdecl;
-                      external 'SDL2' name 'SDL_SetError'; varargs;
+function TTF_SetError(const fmt: pchar): longint; cdecl; external 'SDL2' name 'SDL_SetError'; varargs;
 function TTF_GetError: pchar; cdecl; external 'SDL2' name 'SDL_GetError';
 
 implementation

@@ -239,20 +239,20 @@ type
 
   PSDL_LogOutputFunction=^TSDL_LogOutputFunction;
   TSDL_LogOutputFunction=procedure(userdata: pointer; category: longint;
-                             priority: TSDL_LogPriority; message: pchar); cdecl;
+                             priority: TSDL_LogPriority; const message: pchar); cdecl;
 
 procedure SDL_LogSetAllPriority(priority: TSDL_LogPriority); lSDL;
 procedure SDL_LogSetPriority(category: longint; priority: TSDL_LogPriority); lSDL;
 function SDL_GetPriority(category: longint): TSDL_LogPriority; lSDL;
 procedure SDL_LogResetPriorities; lSDL;
-procedure SDL_Log(fmt: pchar); lSDL; varargs;
-procedure SDL_LogVerbose(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogDebug(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogInfo(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogWarn(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogError(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogCritical(category: longint; fmt: pchar); lSDL; varargs;
-procedure SDL_LogMessage(category: longint; priority: TSDL_LogPriority; fmt: pchar); lSDL; varargs;
+procedure SDL_Log(const fmt: pchar); lSDL; varargs;
+procedure SDL_LogVerbose(category: longint; const fmt: pchar); lSDL; varargs;
+procedure SDL_LogDebug(category: longint; const fmt: pchar); lSDL; varargs;
+procedure SDL_LogInfo(category: longint; const fmt: pchar); lSDL; varargs;
+procedure SDL_LogWarn(category: longint; const fmt: pchar); lSDL; varargs;
+procedure SDL_LogError(category: longint; const fmt: pchar); lSDL; varargs;
+procedure SDL_LogCritical(category: longint; const fmt: pchar); lSDL; varargs;
+procedure SDL_LogMessage(category: longint; priority: TSDL_LogPriority; const fmt: pchar); lSDL; varargs;
 procedure SDL_LogGetOutputFunction(callback: PSDL_LogOutputFunction; userdata: ppointer); lSDL;
 procedure SDL_LogSetOutputFunction(callback: TSDL_LogOutputFunction; userdata: pointer); lSDL;
 
@@ -439,7 +439,7 @@ const
   SDL_BYTEORDER: Uint16=SDL_BIG_ENDIAN;
 {$ENDIF}
 
-//aliases for Swap
+//aliases for SwapEndian
 function SDL_Swap16(const x: Uint16): Uint16; inline;
 function SDL_Swap32(const x: Uint32): Uint32; inline;
 function SDL_Swap64(const x: Uint64): Uint64; inline;
@@ -2577,39 +2577,40 @@ type
   PSDL_Event=^TSDL_Event;
   TSDL_Event=record
     case Uint32 of
-      0:                                 (type_: Uint32);
-      1:                                 (common: TSDL_CommonEvent);
-      SDL_WINDOWEVENT:                   (window: TSDL_WindowEvent);
+      0:                            (type_: Uint32);
+      1:                            (common: TSDL_CommonEvent);
+      SDL_WINDOWEVENT:              (window: TSDL_WindowEvent);
       SDL_KEYUP,
-      SDL_KEYDOWN:                       (key: TSDL_KeyboardEvent);
-      SDL_TEXTEDITING:                   (edit: TSDL_TextEditingEvent);
-      SDL_TEXTINPUT:                     (text: TSDL_TextInputEvent);
-      SDL_MOUSEMOTION:                   (motion: TSDL_MouseMotionEvent);
+      SDL_KEYDOWN:                  (key: TSDL_KeyboardEvent);
+      SDL_TEXTEDITING:              (edit: TSDL_TextEditingEvent);
+      SDL_TEXTINPUT:                (text: TSDL_TextInputEvent);
+      SDL_MOUSEMOTION:              (motion: TSDL_MouseMotionEvent);
       SDL_MOUSEBUTTONUP,
-      SDL_MOUSEBUTTONDOWN:               (button: TSDL_MouseButtonEvent);
-      SDL_MOUSEWHEEL:                    (wheel: TSDL_MouseWheelEvent);
-      SDL_JOYAXISMOTION:                 (jaxis: TSDL_JoyAxisEvent);
-      SDL_JOYBALLMOTION:                 (jball: TSDL_JoyBallEvent);
-      SDL_JOYHATMOTION:                  (jhat: TSDL_JoyHatEvent);
+      SDL_MOUSEBUTTONDOWN:          (button: TSDL_MouseButtonEvent);
+      SDL_MOUSEWHEEL:               (wheel: TSDL_MouseWheelEvent);
+      SDL_JOYAXISMOTION:            (jaxis: TSDL_JoyAxisEvent);
+      SDL_JOYBALLMOTION:            (jball: TSDL_JoyBallEvent);
+      SDL_JOYHATMOTION:             (jhat: TSDL_JoyHatEvent);
       SDL_JOYBUTTONDOWN,
-      SDL_JOYBUTTONUP:                   (jbutton: TSDL_JoyButtonEvent);
+      SDL_JOYBUTTONUP:              (jbutton: TSDL_JoyButtonEvent);
       SDL_JOYDEVICEADDED,
-      SDL_JOYDEVICEREMOVED:              (jdevice: TSDL_JoyDeviceEvent);
-      SDL_CONTROLLERAXISMOTION:          (caxis: TSDL_ControllerAxisEvent);
+      SDL_JOYDEVICEREMOVED:         (jdevice: TSDL_JoyDeviceEvent);
+      SDL_CONTROLLERAXISMOTION:     (caxis: TSDL_ControllerAxisEvent);
       SDL_CONTROLLERBUTTONUP,
-      SDL_CONTROLLERBUTTONDOWN:          (cbutton: TSDL_ControllerButtonEvent);
+      SDL_CONTROLLERBUTTONDOWN:     (cbutton: TSDL_ControllerButtonEvent);
       SDL_CONTROLLERDEVICEADDED,
       SDL_CONTROLLERDEVICEREMOVED,
-      SDL_CONTROLLERDEVICEREMAPPED:      (cdevice: TSDL_ControllerDeviceEvent);
-      SDL_QUITEV:                        (quit: TSDL_QuitEvent);
-      SDL_USEREVENT:                     (user: TSDL_UserEvent);
-      SDL_SYSWMEVENT:                    (syswm: TSDL_SysWMEvent);
+      SDL_CONTROLLERDEVICEREMAPPED: (cdevice: TSDL_ControllerDeviceEvent);
+      SDL_QUITEV:                   (quit: TSDL_QuitEvent);
+      SDL_USEREVENT:                (user: TSDL_UserEvent);
+      SDL_SYSWMEVENT:               (syswm: TSDL_SysWMEvent);
       SDL_FINGERDOWN,
       SDL_FINGERUP,
-      SDL_FINGERMOTION:                  (tfinger: TSDL_TouchFingerEvent);
-      SDL_MULTIGESTURE:                  (mgesture: TSDL_MultiGestureEvent);
-      SDL_DOLLARGESTURE,SDL_DOLLARRECORD:(dgesture: TSDL_DollarGestureEvent);
-      SDL_DROPFILE:                      (drop: TSDL_DropEvent);
+      SDL_FINGERMOTION:             (tfinger: TSDL_TouchFingerEvent);
+      SDL_MULTIGESTURE:             (mgesture: TSDL_MultiGestureEvent);
+      SDL_DOLLARGESTURE,
+      SDL_DOLLARRECORD:             (dgesture: TSDL_DollarGestureEvent);
+      SDL_DROPFILE:                 (drop: TSDL_DropEvent);
       SDL_LASTEVENT+1: (padding: array[0..55] of Uint8);
   end;
 
@@ -2748,17 +2749,17 @@ end;
 
 function SDL_Swap16(const x: Uint16): Uint16; inline;
 begin
-  SDL_Swap16:=Swap(x);
+  SDL_Swap16:=SwapEndian(x);
 end;
 
 function SDL_Swap32(const x: Uint32): Uint32; inline;
 begin
-  SDL_Swap32:=Swap(x);
+  SDL_Swap32:=SwapEndian(x);
 end;
 
 function SDL_Swap64(const x: Uint64): Uint64; inline;
 begin
-  SDL_Swap64:=Swap(x);
+  SDL_Swap64:=SwapEndian(x);
 end;
 
 function SDL_SwapFloat(const x: float): float; inline;
@@ -2770,7 +2771,7 @@ var
   end;
 begin
   swapper.f:=x;
-  swapper.ui32:=Swap(swapper.ui32);
+  swapper.ui32:=SwapEndian(swapper.ui32);
   SDL_SwapFloat:=swapper.f;
 end;
 
@@ -2832,7 +2833,7 @@ end;
 function SDL_RWseek(ctx: PSDL_RWops; offset: Sint64;
                     whence: longint): Sint64; inline;
 begin
-  SDL_RWseek:=ctx^.seek(ctx,offset,whence);
+  SDL_RWseek:=ctx^.seek(ctx, offset, whence);
 end;
 
 function SDL_RWtell(ctx: PSDL_RWops): Sint64;
@@ -2894,13 +2895,10 @@ begin
   SDL_AUDIO_ISUNSIGNED:=not SDL_AUDIO_ISSIGNED(x);
 end;
 
-function SDL_LoadWAV(file_: pchar;
-                     spec: PSDL_AudioSpec;
-                     audio_buf: ppbyte;
-                     audio_len: PUint32): PSDL_AudioSpec; inline;
+function SDL_LoadWAV(file_: pchar; spec: PSDL_AudioSpec;
+            audio_buf: ppbyte; audio_len: PUint32): PSDL_AudioSpec; inline;
 begin
-  SDL_LoadWAV:=SDL_LoadWAV_RW(SDL_RWFromFile(file_, 'r'), 1,
-                              spec, audio_buf, audio_len);
+  SDL_LoadWAV:=SDL_LoadWAV_RW(SDL_RWFromFile(file_, 'r'), 1, spec, audio_buf, audio_len);
 end;
 //=====SDL_PIXELS=====
 
