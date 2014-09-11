@@ -1,5 +1,12 @@
 SDL2 headers for Free Pascal
 
+1.16 (11.09.14)
+  Fixed SDLNet_SocketReady
+  SDL_SwapFloat now uses absolute variable instead of "swap" record
+  Added 'b' in file mode strings as in original sources
+  Pchar changed to PAnsiChar
+  Small formatting changes
+
 1.15 (13.08.14)
   Fixed bug in SDL_SwapXX functions
   Added Mix_Linked_Version

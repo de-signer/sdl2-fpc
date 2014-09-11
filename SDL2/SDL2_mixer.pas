@@ -20,7 +20,7 @@ uses SDL2;
 {$INLINE ON}
 {$PACKRECORDS C}
 
-{$DEFINE lSDL:=cdecl; external 'SDL2_mixer'}
+{$DEFINE lSDL := cdecl; external 'SDL2_mixer'}
 
 {$IFDEF DARWIN}
   {$linkframework SDL2}
@@ -28,49 +28,49 @@ uses SDL2;
 {$ENDIF}
 
 const
-  SDL_MIXER_MAJOR_VERSION=2;
-  SDL_MIXER_MINOR_VERSION=0;
-  SDL_MIXER_PATCHLEVEL   =0;
+  SDL_MIXER_MAJOR_VERSION = 2;
+  SDL_MIXER_MINOR_VERSION = 0;
+  SDL_MIXER_PATCHLEVEL    = 0;
 
-  MIX_INIT_FLAC      =$00000001;
-  MIX_INIT_MOD       =$00000002;
-  MIX_INIT_MODPLUG   =$00000004;
-  MIX_INIT_MP3       =$00000008;
-  MIX_INIT_OGG       =$00000010;
-  MIX_INIT_FLUIDSYNTH=$00000020;
+  MIX_INIT_FLAC       = $00000001;
+  MIX_INIT_MOD        = $00000002;
+  MIX_INIT_MODPLUG    = $00000004;
+  MIX_INIT_MP3        = $00000008;
+  MIX_INIT_OGG        = $00000010;
+  MIX_INIT_FLUIDSYNTH = $00000020;
 
-  MIX_CHANNELS=8;
+  MIX_CHANNELS = 8;
 
-  MIX_DEFAULT_FREQUENCY=22050;
+  MIX_DEFAULT_FREQUENCY = 22050;
 
 {$IFDEF FPC_LITTLE_ENDIAN}
-  MIX_DEFAULT_FORMAT=AUDIO_S16LSB;
+  MIX_DEFAULT_FORMAT = AUDIO_S16LSB;
 {$ELSE}
-  MIX_DEFAULT_FORMAT=AUDIO_S16MSB;
+  MIX_DEFAULT_FORMAT = AUDIO_S16MSB;
 {$ENDIF}
 
-  MIX_DEFAULT_CHANNELS=2;
-  MIX_MAX_VOLUME=128;
+  MIX_DEFAULT_CHANNELS = 2;
+  MIX_MAX_VOLUME = 128;
 
-  MIX_CHANNEL_POST=-2;
+  MIX_CHANNEL_POST = -2;
 
-  MIX_EFFECTSMAXSPEED='MIX_EFFECTSMAXSPEED';
+  MIX_EFFECTSMAXSPEED = 'MIX_EFFECTSMAXSPEED';
 
 type
-  PMix_Chunk=^TMix_Chunk;
-  TMix_Chunk=record
+  PMix_Chunk = ^TMix_Chunk;
+  TMix_Chunk = record
     allocated: longint;
     abuf: PUint8;
     alen: Uint32;
     volume: Uint8;
   end;
 
-  TMix_Fading=(
+  TMix_Fading = (
     MIX_NO_FADING,
     MIX_FADING_OUT,
     MIX_FADING_IN);
 
-  TMix_MusicType=(
+  TMix_MusicType = (
     MUS_NONE,
     MUS_CMD,
     MUS_WAV,
@@ -82,7 +82,7 @@ type
     MUS_FLAC,
     MUS_MODPLUG);
 
-  PMix_Music=pointer;
+  PMix_Music = pointer;
 
 procedure SDL_MIXER_VERSION(x: PSDL_Version); inline;
 function Mix_Linked_Version: PSDL_Version; lSDL;
@@ -95,8 +95,8 @@ function Mix_AllocateChannels(numchans: longint): longint; lSDL;
 function Mix_QuerySpec(frequency: plongint; format: PUint16; channels: plongint): longint; lSDL;
 
 function Mix_LoadWAV_RW(src: PSDL_RWops; freesrc: longint): PMix_Chunk; lSDL;
-function Mix_LoadWAV(file_: pchar): PMix_Chunk; inline;
-function Mix_LoadMUS(const file_: pchar): PMix_Music; lSDL;
+function Mix_LoadWAV(file_: PAnsiChar): PMix_Chunk; inline;
+function Mix_LoadMUS(const file_: PAnsiChar): PMix_Music; lSDL;
 function Mix_LoadMUS_RW(src: PSDL_RWops; freesrc: longint): PMix_Music; lSDL;
 function Mix_LoadMUSType_RW(src: PSDL_RWops; type_: TMix_MusicType; freesrc: longint): PMix_Music; lSDL;
 function Mix_QuickLoad_WAV(mem: PUint8): PMix_Chunk; lSDL;
@@ -106,13 +106,13 @@ procedure Mix_FreeChunk(chunk: PMix_Chunk); lSDL;
 procedure Mix_FreeMusic(music: PMix_Music); lSDL;
 
 function Mix_GetNumChunkDecoders: longint; lSDL;
-function Mix_GetChunkDecoder(index: longint): pchar; lSDL;
+function Mix_GetChunkDecoder(index: longint): PAnsiChar; lSDL;
 function Mix_GetNumMusicDecoders: longint; lSDL;
-function Mix_GetMusicDecoder(index: longint): pchar; lSDL;
+function Mix_GetMusicDecoder(index: longint): PAnsiChar; lSDL;
 function Mix_GetMusicType(const music: PMix_Music): TMix_MusicType; lSDL;
 
 type
-  TMixFunction=procedure(udata: pointer; stream: PUint8; lon: longint); cdecl;
+  TMixFunction = procedure(udata: pointer; stream: PUint8; lon: longint); cdecl;
 
 procedure Mix_SetPostMix(mix_func: TMixFunction; arg: pointer); lSDL;
 procedure Mix_HookMusic(mix_func: TMixFunction; arg: pointer); lSDL;
@@ -120,7 +120,7 @@ procedure Mix_HookMusicFinished(music_finished: pointer); lSDL;
 function Mix_GetMusicHookData: pointer; lSDL;
 
 type
-  TChannelFinished=procedure(channel: longint); cdecl;
+  TChannelFinished = procedure(channel: longint); cdecl;
 
 procedure Mix_ChannelFinished(channel_finished: TChannelFinished); lSDL;
 
@@ -186,48 +186,48 @@ function Mix_SetMusicPosition(position: double): longint; lSDL;
 function Mix_Playing(channel: longint): longint; lSDL;
 function Mix_PlayingMusic: longint; lSDL;
 
-function Mix_SetMusicCMD(const command: pchar): longint; lSDL;
+function Mix_SetMusicCMD(const command: PAnsiChar): longint; lSDL;
 
 function Mix_SetSynchroValue(value: longint): longint; lSDL;
 function Mix_GetSynchroValue: longint; lSDL;
 
-function Mix_SetSoundFonts(const paths: pchar): longint; lSDL;
-function Mix_GetSoundFonts: pchar; lSDL;
+function Mix_SetSoundFonts(const paths: PAnsiChar): longint; lSDL;
+function Mix_GetSoundFonts: PAnsiChar; lSDL;
 
 type
-  TEachSoundFont_f=function(c: pchar; p: pointer): longint; cdecl;
+  TEachSoundFont_f = function(c: PAnsiChar; p: pointer): longint; cdecl;
 
-function Mix_EachSoundFont(fn: TEachSoundFont_f; data: pchar): longint; lSDL;
+function Mix_EachSoundFont(fn: TEachSoundFont_f; data: PAnsiChar): longint; lSDL;
 
 function Mix_GetChunk(channel: longint): PMix_Chunk; lSDL;
 
 procedure Mix_CloseAudio; lSDL;
 
-function Mix_SetError(const fmt: pchar): longint; cdecl; external 'SDL2' name 'SDL_SetError'; varargs;
-function Mix_GetError: pchar; cdecl; external 'SDL2' name 'SDL_GetError';
+function Mix_SetError(const fmt: PAnsiChar): longint; cdecl; external 'SDL2' name 'SDL_SetError'; varargs;
+function Mix_GetError: PAnsiChar; cdecl; external 'SDL2' name 'SDL_GetError';
 
 implementation
 
 procedure SDL_MIXER_VERSION(x: PSDL_Version); inline;
 begin
-  x^.major:=SDL_MIXER_MAJOR_VERSION;
-  x^.minor:=SDL_MIXER_MINOR_VERSION;
-  x^.patch:=SDL_MIXER_PATCHLEVEL;
+  x^.major := SDL_MIXER_MAJOR_VERSION;
+  x^.minor := SDL_MIXER_MINOR_VERSION;
+  x^.patch := SDL_MIXER_PATCHLEVEL;
 end;
 
-function Mix_LoadWAV(file_: pchar): PMix_Chunk; inline;
+function Mix_LoadWAV(file_: PAnsiChar): PMix_Chunk; inline;
 begin
-  Mix_LoadWAV:=Mix_LoadWAV_RW(SDL_RWFromFile(file_, 'r'), 1);
+  Mix_LoadWAV := Mix_LoadWAV_RW(SDL_RWFromFile(file_, 'rb'), 1);
 end;
 
 function Mix_PlayChannel(channel: longint; chunk: PMix_Chunk; loops: longint): longint; inline;
 begin
-  Mix_PlayChannel:=Mix_PlayChannelTimed(channel, chunk, loops, -1);
+  Mix_PlayChannel := Mix_PlayChannelTimed(channel, chunk, loops, -1);
 end;
 
 function Mix_FadeInChannel(channel: longint; chunk: PMix_Chunk; loops, ms: longint): longint; inline;
 begin
-  Mix_FadeInChannel:=Mix_FadeInChannelTimed(channel, chunk, loops, ms, -1);
+  Mix_FadeInChannel := Mix_FadeInChannelTimed(channel, chunk, loops, ms, -1);
 end;
 
 end.
