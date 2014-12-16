@@ -1,4 +1,9 @@
-SDL2 headers for Free Pascal
+SDL2 headers for Free Pascal Compiler
+
+1.17 (17.12.14)
+  SDL_CreateThread fix for Windows
+  SDL_TRUE and SDL_FALSE
+  SDL_Error and related macros
 
 1.16 (11.09.14)
   Fixed SDLNet_SocketReady

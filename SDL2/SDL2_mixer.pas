@@ -125,8 +125,8 @@ type
 procedure Mix_ChannelFinished(channel_finished: TChannelFinished); lSDL;
 
 type
-  TMix_EffectFunc_t=procedure(chan: longint; stream: pointer; len: longint; udata: pointer); cdecl;
-  TMix_EffectDone_t=procedure(chan: longint; udata: pointer); cdecl;
+  TMix_EffectFunc_t = procedure(chan: longint; stream: pointer; len: longint; udata: pointer); cdecl;
+  TMix_EffectDone_t = procedure(chan: longint; udata: pointer); cdecl;
 
 function Mix_RegisterEffect(chan: longint; f: TMix_EffectFunc_t;
                             d: TMix_EffectDone_t; arg: pointer): longint; lSDL;

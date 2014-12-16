@@ -37,8 +37,13 @@ interface
 
 //=====SDL_STDINC=====
 
+const
+  SDL_FALSE = 0;
+  SDL_TRUE = 1;
+
 type
   SDL_bool = longbool;
+
 
   PUint64 = ^Uint64;
 
@@ -65,8 +70,7 @@ function SDL_realloc(mem: pointer; size: size_t): pointer; lSDL;
 procedure SDL_free(mem: pointer); lSDL;
 
 function SDL_getenv(name: PAnsiChar): PAnsiChar; lSDL;
-function SDL_setenv(const name, value: PAnsiChar;
-                    overwrite: longint): longint; lSDL;
+function SDL_setenv(const name, value: PAnsiChar; overwrite: longint): longint; lSDL;
 
 type
   comparefn = function(a1, a2: pointer): longint; cdecl;
@@ -209,6 +213,21 @@ function SDL_GetPrefPath(const org, app: PAnsiChar): PAnsiChar; lSDL;
 function SDL_SetError(const fmt: PAnsiChar): longint; lSDL; varargs;
 function SDL_GetError: PAnsiChar; lSDL;
 procedure SDL_ClearError; lSDL;
+
+function SDL_OutOfMemory: longint; inline;
+function SDL_Unsupported: longint; inline;
+function SDL_InvalidParamError(param: PAnsiChar): longint; inline;
+
+type
+  TSDL_errorcode = (
+    SDL_ENOMEM,
+    SDL_EFREAD,
+    SDL_EFWRITE,
+    SDL_EFSEEK,
+    SDL_UNSUPPORTED_,
+    SDL_LASTERROR);
+
+function SDL_Error(code: TSDL_errorcode): longint; lSDL;
 
 //=====SDL_LOG=====
 
@@ -409,7 +428,14 @@ type
 
   TSDL_ThreadFunction = function(data: pointer): longint; cdecl;
 
+{$IFDEF WINDOWS}
+function SDL_CreateThread(fn: TSDL_ThreadFunction; name: PAnsiChar; data: pointer;
+                      pfnBeginThread, pfnEndThread: pointer): PSDL_Thread; lSDL;
+function SDL_CreateThread(fn: TSDL_ThreadFunction; name: PAnsiChar; data: pointer): PSDL_Thread; inline;
+{$ELSE}
 function SDL_CreateThread(fn: TSDL_ThreadFunction; name: PAnsiChar; data: pointer): PSDL_Thread; lSDL;
+{$ENDIF}
+
 function SDL_GetThreadName(thread: PSDL_Thread): PAnsiChar; lSDL;
 function SDL_ThreadID: TSDL_threadID; lSDL;
 function SDL_GetThreadID(thread: PSDL_Thread): TSDL_threadID; lSDL;
@@ -524,7 +550,7 @@ type
     end;
   end;
 
-function SDL_RWFromFile(const file_: PAnsiChar; const mode: PAnsiChar): PSDL_RWops; lSDL;
+function SDL_RWFromFile(const file_, mode: PAnsiChar): PSDL_RWops; lSDL;
 function SDL_RWFromFP(fp: pointer; autoclose: SDL_bool): PSDL_RWops; lSDL;
 function SDL_RWFromMem(mem: pointer; size: longint): PSDL_RWops; lSDL;
 function SDL_RWFromConstMem(const mem: pointer; size: longint): PSDL_RWops; lSDL;
@@ -1109,7 +1135,7 @@ procedure SDL_EnableScreenSaver; lSDL;
 procedure SDL_DisableScreenSaver; lSDL;
 
 function SDL_GL_LoadLibrary(const path: PAnsiChar): longint; lSDL;
-function SDL_GL_GetProcAddress(const proc:  PAnsiChar): pointer; lSDL;
+function SDL_GL_GetProcAddress(const proc: PAnsiChar): pointer; lSDL;
 procedure SDL_GL_UnloadLibrary; lSDL;
 function SDL_GL_ExtensionSupported(const extension: PAnsiChar): SDL_bool; lSDL;
 procedure SDL_GL_ResetAttributes; lSDL;
@@ -2718,6 +2744,23 @@ begin
   SDL_VERSION_ATLEAST := (SDL_COMPILEDVERSION >= SDL_VERSIONNUM(X, Y, Z));
 end;
 
+//=====SDL_ERROR=====
+
+function SDL_OutOfMemory: longint; inline;
+begin
+  SDL_OutOfMemory := SDL_Error(SDL_ENOMEM);
+end;
+
+function SDL_Unsupported: longint; inline;
+begin
+  SDL_Unsupported := SDL_Error(SDL_UNSUPPORTED_);
+end;
+
+function SDL_InvalidParamError(param: PAnsiChar): longint; inline;
+begin
+  SDL_InvalidParamError := SDL_SetError('Parameter ''%s'' is invalid', (param));
+end;
+
 //=====SDL_TIMER=====
 
 function SDL_TICKS_PASSED(a, b: Uint32): SDL_bool; inline;
@@ -2736,6 +2779,15 @@ function SDL_MutexV(mutex: PSDL_Mutex): longint; inline;
 begin
   SDL_MutexV := SDL_UnlockMutex(mutex);
 end;
+
+//=====SDL_THREAD=====
+
+{$IFDEF WINDOWS}
+function SDL_CreateThread(fn: TSDL_ThreadFunction; name: PAnsiChar; data: pointer): PSDL_Thread; inline;
+begin
+  SDL_CreateThread := SDL_CreateThread(fn, name, data, NIL, NIL);
+end;
+{$ENDIF}
 
 //=====SDL_ENDIAN=====
 
