@@ -1,7 +1,6 @@
-Complete SDL 2 headers translation for Free Pascal
---------------------------------------------------
+# Complete SDL 2 headers translation for Free Pascal
 
-**Includes:**
+## Includes:
 
 * SDL2
 * SDL2_mixer
@@ -9,7 +8,7 @@ Complete SDL 2 headers translation for Free Pascal
 * SDL2_image
 * SDL2_net
 
-**Mac OS notes**
+## Mac OS notes
 
 Headers are not tested on Mac OS (I am not sure about `{$LINKFRAMEWORK ...}`),
 so if you able to do this or just know anything about linking SDL2 with FPC
