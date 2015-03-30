@@ -18,14 +18,12 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 
-=====
+  ===
 
-  SDL2_image header translation for Free Pascal
-  https://bitbucket.org/p_daniel/sdl-2-for-free-pascal-compiler
-
-=====
+  SDL2_image header for Free Pascal
 
 }
+
 unit SDL2_image;
 
 interface
@@ -65,8 +63,7 @@ function IMG_Load_RW(src: PSDL_RWops; freesrc: longint): PSDL_Surface; lSDL;
 
 function IMG_LoadTexture(renderer: PSDL_Renderer; const file_: PAnsiChar): PSDL_Texture; lSDL;
 function IMG_LoadTexture_RW(renderer: PSDL_Renderer; src: PSDL_RWops; freesrc: longint): PSDL_Texture; lSDL;
-function IMG_LoadTextureTyped_RW(renderer: PSDL_Renderer;
-    src: PSDL_RWops; freesrc: longint; const type_: PAnsiChar): PSDL_Texture; lSDL;
+function IMG_LoadTextureTyped_RW(renderer: PSDL_Renderer; src: PSDL_RWops; freesrc: longint; const type_: PAnsiChar): PSDL_Texture; lSDL;
 
 function IMG_isICO(src: PSDL_RWops): longint; lSDL;
 function IMG_isCUR(src: PSDL_RWops): longint; lSDL;

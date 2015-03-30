@@ -19,14 +19,12 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 
-=====
+  ===
 
-  SDL2_net header translation for Free Pascal
-  https://bitbucket.org/p_daniel/sdl-2-for-free-pascal-compiler
-
-=====
+  SDL2_net header for Free Pascal
 
 }
+
 unit SDL2_net;
 
 interface
@@ -52,7 +50,7 @@ uses SDL2;
 {$ENDIF}
 
 type
-  PSDLNet_version  =  ^TSDL_version;
+  PSDLNet_version = ^TSDL_version;
 {$ENDIF WITHOUT_SDL}
 
 {$MACRO ON}
@@ -89,11 +87,9 @@ const
   INADDR_LOOPBACK  = $7f000001;
   INADDR_BROADCAST = $FFFFFFFF;
 
-function SDLNet_ResolveHost(address: PIPaddress; const host: PAnsiChar;
-                            port: Uint16): longint; lSDL;
+function SDLNet_ResolveHost(address: PIPaddress; const host: PAnsiChar; port: Uint16): longint; lSDL;
 function SDLNet_ResolveIP(const ip: PIPaddress): PAnsiChar; lSDL;
-function SDLNet_GetLocalAddresses(addresses: PIPaddress;
-                                  maxcount: longint): longint; lSDL;
+function SDLNet_GetLocalAddresses(addresses: PIPaddress; maxcount: longint): longint; lSDL;
 
 type
   PTCPsocket = pointer;
@@ -183,27 +179,27 @@ end;
 
 function SDLNet_TCP_AddSocket(set_: PSDLNet_SocketSet; sock: PTCPsocket): longint; inline;
 begin
-  SDLNet_TCP_AddSocket := SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
+  exit(SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock)));
 end;
 
 function SDLNet_UDP_AddSocket(set_: PSDLNet_SocketSet; sock: PUDPsocket): longint; inline;
 begin
-  SDLNet_UDP_AddSocket := SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
+  exit(SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock)));
 end;
 
 function SDLNet_TCP_DelSocket(set_: PSDLNet_SocketSet; sock: PTCPsocket): longint; inline;
 begin
-  SDLNet_TCP_DelSocket := SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
+  exit(SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock)));
 end;
 
 function SDLNet_UDP_DelSocket(set_: PSDLNet_SocketSet; sock: PUDPsocket): longint; inline;
 begin
-  SDLNet_UDP_DelSocket := SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock));
+  exit(SDLNet_TCP_AddSocket(set_, PSDLNet_GenericSocket(sock)));
 end;
 
 function SDLNet_SocketReady(sock: PSDLNet_GenericSocket): boolean; inline;
 begin
-  SDLNet_SocketReady := ((sock <> NIL) and (sock^.ready <> 0));
+  exit((sock <> NIL) and (sock^.ready <> 0));
 end;
 
 procedure SDLNet_Write16(value: Uint16; areap: pointer); inline;
@@ -218,12 +214,12 @@ end;
 
 function SDLNet_Read16(const areap: pointer): Uint16; inline;
 begin
-  SDLNet_Read16 := BEtoN(PUint16(areap)^);
+  exit(BEtoN(PUint16(areap)^));
 end;
 
 function SDLNet_Read32(const areap: pointer): Uint32; inline;
 begin
-  SDLNet_Read32 := BEtoN(PUint32(areap)^);
+  exit(BEtoN(PUint32(areap)^));
 end;
 
 end.

@@ -1,4 +1,4 @@
-# Complete SDL 2 headers translation for Free Pascal
+# SDL 2 headers for Free Pascal
 
 ## Includes:
 

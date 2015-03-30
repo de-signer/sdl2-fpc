@@ -18,14 +18,12 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 
-=====
+  ===
 
-  SDL2_ttf header translation for Free Pascal
-  https://bitbucket.org/p_daniel/sdl-2-for-free-pascal-compiler
-
-=====
+  SDL2_ttf header for Free Pascal
 
 }
+
 unit SDL2_ttf;
 
 interface
@@ -101,8 +99,7 @@ function TTF_FontFaceStyleName(const font: PTTF_Font): PAnsiChar; lSDL;
 
 function TTF_GlyphIsProvided(const font: PTTF_Font; ch: Uint16): longint; lSDL;
 
-function TTF_GlyphMetrics(font: PTTF_Font; ch: Uint16;
-                      minx, maxx, miny, maxy, advance: plongint): longint; lSDL;
+function TTF_GlyphMetrics(font: PTTF_Font; ch: Uint16; minx, maxx, miny, maxy, advance: plongint): longint; lSDL;
 
 function TTF_SizeText(font: PTTF_Font; const text: PAnsiChar; w, h: plongint): longint; lSDL;
 function TTF_SizeUTF8(font: PTTF_Font; const text: PAnsiChar; w, h: plongint): longint; lSDL;
@@ -124,12 +121,9 @@ function TTF_RenderText_Blended(font: PTTF_Font; const text: PAnsiChar; fg: TSDL
 function TTF_RenderUTF8_Blended(font: PTTF_Font; const text: PAnsiChar; fg: TSDL_Color): PSDL_Surface; lSDL;
 function TTF_RenderUNICODE_Blended(font: PTTF_Font; const text: PUint16; fg: TSDL_Color): PSDL_Surface; lSDL;
 
-function TTF_RenderText_Blended_Wrapped(font: PTTF_Font; const text: PAnsiChar;
-                        fg: TSDL_Color; wrapLength: Uint32): PSDL_Surface; lSDL;
-function TTF_RenderUTF8_Blended_Wrapped(font: PTTF_Font; const text: PAnsiChar;
-                         fg: TSDL_Color;wrapLength: Uint32): PSDL_Surface; lSDL;
-function TTF_RenderUNICODE_Blended_Wrapped(font: PTTF_Font; const text: PUint16;
-                        fg: TSDL_Color; wrapLength: Uint32): PSDL_Surface; lSDL;
+function TTF_RenderText_Blended_Wrapped(font: PTTF_Font; const text: PAnsiChar; fg: TSDL_Color; wrapLength: Uint32): PSDL_Surface; lSDL;
+function TTF_RenderUTF8_Blended_Wrapped(font: PTTF_Font; const text: PAnsiChar; fg: TSDL_Color;wrapLength: Uint32): PSDL_Surface; lSDL;
+function TTF_RenderUNICODE_Blended_Wrapped(font: PTTF_Font; const text: PUint16; fg: TSDL_Color; wrapLength: Uint32): PSDL_Surface; lSDL;
 
 function TTF_RenderGlyph_Blended(font: PTTF_Font; ch: Uint16; fg: TSDL_Color): PSDL_Surface; lSDL;
 

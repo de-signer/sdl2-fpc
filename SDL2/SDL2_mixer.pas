@@ -18,14 +18,12 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 
-=====
+  ===
 
-  SDL2_mixer header translation for Free Pascal
-  https://bitbucket.org/p_daniel/sdl-2-for-free-pascal-compiler
-
-=====
+  SDL2_mixer header for Free Pascal
 
 }
+
 unit SDL2_mixer;
 
 interface
@@ -144,8 +142,7 @@ type
   TMix_EffectFunc_t = procedure(chan: longint; stream: pointer; len: longint; udata: pointer); cdecl;
   TMix_EffectDone_t = procedure(chan: longint; udata: pointer); cdecl;
 
-function Mix_RegisterEffect(chan: longint; f: TMix_EffectFunc_t;
-                            d: TMix_EffectDone_t; arg: pointer): longint; lSDL;
+function Mix_RegisterEffect(chan: longint; f: TMix_EffectFunc_t; d: TMix_EffectDone_t; arg: pointer): longint; lSDL;
 function Mix_UnregisterEffect(channel: longint; f: TMix_EffectFunc_t): longint; lSDL;
 function Mix_UnregisterAllEffects(channel: longint): longint; lSDL;
 
@@ -233,17 +230,17 @@ end;
 
 function Mix_LoadWAV(file_: PAnsiChar): PMix_Chunk; inline;
 begin
-  Mix_LoadWAV := Mix_LoadWAV_RW(SDL_RWFromFile(file_, 'rb'), 1);
+  exit(Mix_LoadWAV_RW(SDL_RWFromFile(file_, 'rb'), 1));
 end;
 
 function Mix_PlayChannel(channel: longint; chunk: PMix_Chunk; loops: longint): longint; inline;
 begin
-  Mix_PlayChannel := Mix_PlayChannelTimed(channel, chunk, loops, -1);
+  exit(Mix_PlayChannelTimed(channel, chunk, loops, -1));
 end;
 
 function Mix_FadeInChannel(channel: longint; chunk: PMix_Chunk; loops, ms: longint): longint; inline;
 begin
-  Mix_FadeInChannel := Mix_FadeInChannelTimed(channel, chunk, loops, ms, -1);
+  exit(Mix_FadeInChannelTimed(channel, chunk, loops, ms, -1));
 end;
 
 end.
