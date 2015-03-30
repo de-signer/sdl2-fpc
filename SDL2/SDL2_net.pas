@@ -204,12 +204,12 @@ end;
 
 procedure SDLNet_Write16(value: Uint16; areap: pointer); inline;
 begin
-  PUint16(areap)^ := BEtoN(value);
+  PUint16(areap)^ := NtoBE(value);
 end;
 
 procedure SDLNet_Write32(value: Uint32; areap: pointer); inline;
 begin
-  PUint32(areap)^ := BEtoN(value);
+  PUint32(areap)^ := NtoBE(value);
 end;
 
 function SDLNet_Read16(const areap: pointer): Uint16; inline;
